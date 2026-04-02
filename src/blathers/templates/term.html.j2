@@ -1,0 +1,46 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ term.local_name }} — {{ metadata.title }}{% endblock %}
+
+{% block content %}
+<div class="term-page">
+    <nav class="breadcrumb">
+        <a href="{{ base_path }}index.html">{{ metadata.title }}</a> &rsaquo;
+        <a href="{{ base_path }}index.html#{{ term_type }}">{{ term_type | capitalize }}</a> &rsaquo;
+        {{ term.local_name }}
+    </nav>
+
+    <h1>{{ term.label or term.local_name }}</h1>
+    <p class="iri"><code>{{ term.iri }}</code></p>
+
+    {% if term.comment %}
+    <p class="description">{{ term.comment }}</p>
+    {% endif %}
+
+    {% if term.superclasses is defined and term.superclasses %}
+    <h2>Superclasses</h2>
+    <ul>{% for sc in term.superclasses %}<li>{{ sc }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if term.subclasses is defined and term.subclasses %}
+    <h2>Subclasses</h2>
+    <ul>{% for sc in term.subclasses %}<li>{{ sc }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if term.domain is defined and term.domain %}
+    <h2>Domain</h2>
+    <p>{{ term.domain }}</p>
+    {% endif %}
+
+    {% if term.range is defined and term.range %}
+    <h2>Range</h2>
+    <p>{{ term.range }}</p>
+    {% endif %}
+
+    {% if term.sidecar %}
+    <section class="sidecar-content">
+        {{ term.sidecar | safe }}
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

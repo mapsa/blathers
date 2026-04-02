@@ -1,0 +1,69 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="index-page">
+    {% for section in sections %}
+    <section class="narrative" id="section-{{ section.filename | replace('.md','') | replace('_','') }}">
+        {{ section.html | safe }}
+    </section>
+    {% endfor %}
+
+    <section id="classes">
+        <h2>Classes</h2>
+        <table class="term-table">
+            <thead><tr><th>Class</th><th>Label</th><th>Description</th></tr></thead>
+            <tbody>
+            {% for cls in classes %}
+            <tr>
+                <td><a href="classes/{{ cls.local_name }}.html">{{ cls.local_name }}</a></td>
+                <td>{{ cls.label or '' }}</td>
+                <td>{{ cls.comment or '' }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section id="properties">
+        <h2>Properties</h2>
+        <table class="term-table">
+            <thead><tr><th>Property</th><th>Domain</th><th>Range</th></tr></thead>
+            <tbody>
+            {% for prop in properties %}
+            <tr>
+                <td><a href="properties/{{ prop.local_name }}.html">{{ prop.local_name }}</a></td>
+                <td>{{ prop.domain or '' }}</td>
+                <td>{{ prop.range or '' }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    {% if shapes %}
+    <section id="shapes">
+        <h2>SHACL Shapes</h2>
+        <ul>
+        {% for shape in shapes %}
+            <li><strong>{{ shape.local_name }}</strong> → targets {{ shape.target_class or 'unknown' }}</li>
+        {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if conneg.formats %}
+    <section id="serializations">
+        <h2>Serializations</h2>
+        <ul>
+        {% for fmt in conneg.formats %}
+            {% if fmt == 'ttl' %}<li><a href="ontology.ttl">Turtle</a></li>
+            {% elif fmt == 'jsonld' %}<li><a href="ontology.jsonld">JSON-LD</a></li>
+            {% elif fmt == 'nt' %}<li><a href="ontology.nt">N-Triples</a></li>
+            {% elif fmt == 'owl' %}<li><a href="ontology.owl">RDF/XML</a></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
