@@ -1,0 +1,34 @@
+ontology: minimal.ttl
+shacl:
+  - shapes.ttl
+examples:
+  - instance.ttl
+sidecars: sidecars/
+figures: figures/
+output: dist/
+
+metadata:
+  title: "Test Ontology"
+  version: "0.1.0"
+  license: MIT
+  namespace: "http://example.org/test#"
+  prefix: ex
+
+imports:
+  - uri: "http://example.org/imported#"
+    prefix: imp
+    path: imported.ttl
+
+conneg:
+  generate: [htaccess, nginx]
+  base_uri: "http://example.org/test"
+  formats: [html, ttl, jsonld, nt]
+
+validation:
+  fail_on: error
+  rules:
+    shacl: true
+    consistency: true
+    completeness: true
+    conventions: true
+    overlap: true

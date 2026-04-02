@@ -1,0 +1,17 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix imp:  <http://example.org/imported#> .
+
+<http://example.org/imported>
+    a owl:Ontology ;
+    rdfs:label "Imported Ontology"@en .
+
+imp:MyClass
+    a owl:Class ;
+    rdfs:label "My Class"@en ;
+    rdfs:comment "A class in the imported ontology."@en .
+
+imp:OtherThing
+    a owl:Class ;
+    rdfs:label "Other Thing"@en ;
+    rdfs:comment "Something else."@en .

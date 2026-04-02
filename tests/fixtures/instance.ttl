@@ -1,0 +1,8 @@
+@prefix ex: <http://example.org/test#> .
+
+ex:instance1
+    a ex:MyClass ;
+    ex:myProperty ex:sub1 .
+
+ex:sub1
+    a ex:MySubClass .

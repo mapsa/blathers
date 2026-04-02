@@ -1,0 +1,4 @@
+@prefix ex: <http://example.org/test#> .
+
+ex:badInstance
+    a ex:MyClass .
