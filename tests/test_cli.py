@@ -20,14 +20,16 @@ def test_init_command_exists():
 
 def test_validate_command_exists():
     runner = CliRunner()
-    result = runner.invoke(main, ["validate"])
+    result = runner.invoke(main, ["validate", "--help"])
     assert result.exit_code == 0
+    assert "validators" in result.output.lower() or "config" in result.output.lower()
 
 
 def test_build_command_exists():
     runner = CliRunner()
-    result = runner.invoke(main, ["build"])
+    result = runner.invoke(main, ["build", "--help"])
     assert result.exit_code == 0
+    assert "config" in result.output.lower()
 
 
 def test_fetch_command_exists():
