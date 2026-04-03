@@ -152,7 +152,7 @@ header .version { font-size: 0.85rem; color: var(--accent); }
              padding: 0.1rem 0.45rem; border-radius: 10px; margin-left: 0.3rem; font-weight: normal; }
 [data-theme="dark"] .toc-count { color: #aaa; }
 .toc-sub { list-style: none; padding: 0; margin: 0; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-.toc-list > li:hover .toc-sub, .toc-sub:hover { max-height: 60vh; overflow-y: auto; }
+.toc-sub.open { max-height: 60vh; overflow-y: auto; }
 .toc-sub li { margin: 0; }
 .toc-sub a { padding: 0.2rem 0.75rem 0.2rem 1.5rem; font-size: 0.82em; color: #666; }
 [data-theme="dark"] .toc-sub a { color: #aaa; }

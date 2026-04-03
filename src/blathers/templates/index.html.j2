@@ -286,6 +286,17 @@
             for (var i = 0; i < details.length; i++) details[i].open = false;
         });
     }
+    /* TOC: click section link to toggle sub-list */
+    var sectionLinks = document.querySelectorAll('.toc-section-link');
+    for (var i = 0; i < sectionLinks.length; i++) {
+        sectionLinks[i].addEventListener('click', function(e){
+            var sub = this.nextElementSibling;
+            if (sub && sub.classList.contains('toc-sub')) {
+                e.preventDefault();
+                sub.classList.toggle('open');
+            }
+        });
+    }
 })();
 </script>
 {% endblock %}
