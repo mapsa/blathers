@@ -216,6 +216,16 @@ def build(config_path: str, output_dir: str | None) -> None:
     serialize_ontology(config.resolve_path(config.ontology), out, formats)
     click.echo(f"  Serializations: {', '.join(formats)}")
 
+    # Copy figures
+    figures_dir = config.resolve_path(config.figures)
+    if figures_dir.is_dir():
+        import shutil
+        out_figures = out / "figures"
+        if out_figures.exists():
+            shutil.rmtree(out_figures)
+        shutil.copytree(figures_dir, out_figures)
+        click.echo(f"  Figures copied from {figures_dir}")
+
     # Content negotiation
     if config.conneg.generate:
         generate_conneg(out, config.conneg.generate, config.conneg.base_uri, formats)
