@@ -6,17 +6,117 @@ import json
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, select_autoescape
+from markupsafe import Markup
 
 
-# Minimal CSS for the default theme
-DEFAULT_CSS = """
+# Well-known namespace prefixes
+KNOWN_PREFIXES = {
+    "http://www.w3.org/2002/07/owl#": "owl",
+    "http://www.w3.org/2000/01/rdf-schema#": "rdfs",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
+    "http://www.w3.org/2001/XMLSchema#": "xsd",
+    "http://www.w3.org/ns/shacl#": "sh",
+    "http://purl.org/dc/terms/": "dcterms",
+    "http://purl.org/vocab/vann/": "vann",
+}
+
+
+def _prefixed(iri: str, prefix: str, namespace: str) -> str:
+    """Convert a full IRI to prefix:LocalName."""
+    if iri.startswith(namespace):
+        return f"{prefix}:{iri[len(namespace):]}"
+    for ns, pfx in KNOWN_PREFIXES.items():
+        if iri.startswith(ns):
+            return f"{pfx}:{iri[len(ns):]}"
+    return iri
+
+
+def _local_name(iri: str) -> str:
+    """Extract the local name from an IRI."""
+    if "#" in iri:
+        return iri.split("#")[-1]
+    return iri.rsplit("/", 1)[-1]
+
+
+def _term_anchor(iri: str, namespace: str) -> str:
+    """Return an anchor id for a term IRI."""
+    if iri.startswith(namespace):
+        return iri[len(namespace):]
+    return _local_name(iri)
+
+
+def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties: list) -> str:
+    """Return an HTML anchor link for a term IRI."""
+    pname = _prefixed(iri, prefix, namespace)
+    anchor = _term_anchor(iri, namespace)
+    # Check if the term is in our vocabulary
+    all_iris = {c["iri"] for c in classes} | {p["iri"] for p in properties}
+    if iri in all_iris:
+        return f'<a href="#{anchor}">{pname}</a>'
+    return f'<code>{pname}</code>'
+
+
+def _build_hierarchy(classes: list[dict], namespace: str) -> list[dict]:
+    """Build a nested tree from flat class list using superclasses/subclasses.
+
+    Returns a list of root nodes, each with a 'children' list.
+    """
+    by_iri = {c["iri"]: c for c in classes}
+
+    # Find roots: classes whose superclasses are all outside the namespace
+    roots = []
+    for cls in classes:
+        supers_in_ns = [s for s in cls.get("superclasses", []) if s in by_iri]
+        if not supers_in_ns:
+            roots.append(cls["iri"])
+
+    def _build_node(iri: str, visited: set) -> dict | None:
+        if iri in visited or iri not in by_iri:
+            return None
+        visited.add(iri)
+        cls = by_iri[iri]
+        children = []
+        for child_iri in cls.get("subclasses", []):
+            node = _build_node(child_iri, visited)
+            if node:
+                children.append(node)
+        return {
+            "iri": iri,
+            "local_name": cls["local_name"],
+            "prefixed_name": cls.get("prefixed_name", cls["local_name"]),
+            "label": cls.get("label"),
+            "comment": cls.get("comment"),
+            "children": children,
+        }
+
+    tree = []
+    visited: set[str] = set()
+    for root_iri in roots:
+        node = _build_node(root_iri, visited)
+        if node:
+            tree.append(node)
+
+    # Any classes not yet visited (cycles, disconnected) become additional roots
+    for cls in classes:
+        if cls["iri"] not in visited:
+            node = _build_node(cls["iri"], visited)
+            if node:
+                tree.append(node)
+
+    return tree
+
+
+# Inline CSS — ReSpec-style, works with file:// protocol
+DEFAULT_CSS = r"""
 :root, [data-theme="light"] {
     --bg: #ffffff; --fg: #1a1a2e; --accent: #0066cc;
     --border: #e0e0e0; --code-bg: #f5f5f5; --nav-bg: #f8f9fa;
+    --toc-bg: #f8f9fa; --term-header-bg: #f0f4f8;
 }
 [data-theme="dark"] {
     --bg: #1a1a2e; --fg: #e0e0e0; --accent: #66b3ff;
     --border: #333; --code-bg: #2d2d44; --nav-bg: #16213e;
+    --toc-bg: #16213e; --term-header-bg: #1e2a3a;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -25,19 +125,72 @@ header { background: var(--nav-bg); border-bottom: 1px solid var(--border); padd
 header nav { display: flex; align-items: center; gap: 1rem; max-width: 1200px; margin: 0 auto; }
 header .logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--fg); }
 header .version { font-size: 0.85rem; color: var(--accent); }
-#theme-toggle { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-left: auto; }
+#theme-toggle { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-left: auto; color: var(--fg); }
 main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
 footer { text-align: center; padding: 2rem; font-size: 0.85rem; color: #888; border-top: 1px solid var(--border); margin-top: 3rem; }
 a { color: var(--accent); }
-h1 { margin-bottom: 0.5rem; } h2 { margin: 1.5rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+h1 { margin-bottom: 0.5rem; font-size: 1.8rem; }
+h2 { margin: 2rem 0 0.75rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; font-size: 1.4rem; }
+h3 { margin: 1.5rem 0 0.5rem; font-size: 1.15rem; }
 code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
-.iri { margin-bottom: 1rem; }
+.breadcrumb { margin-bottom: 1rem; font-size: 0.9rem; }
+.narrative { margin-bottom: 2rem; }
+.sidecar-content { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
+
+/* Metadata header */
+.metadata-dl { margin: 1rem 0 2rem; padding: 1rem; background: var(--nav-bg); border: 1px solid var(--border); border-radius: 4px; }
+.metadata-dl dt { font-weight: 600; display: inline; margin-right: 0.5rem; }
+.metadata-dl dt::after { content: ":"; }
+.metadata-dl dd { display: inline; margin: 0 1.5rem 0 0; }
+.metadata-dl .metadata-row { margin-bottom: 0.3rem; }
+
+/* Table of Contents */
+.toc { background: var(--toc-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
+.toc h2 { margin: 0 0 0.5rem; border: none; font-size: 1.1rem; }
+.toc ol { padding-left: 1.5rem; }
+.toc li { margin: 0.2rem 0; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* Term definition tables */
+.term-def { margin-bottom: 2rem; padding: 0; }
+.term-def h3 { margin-top: 0; }
+.term-contents { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1rem; }
+.term-contents th { text-align: left; padding: 0.4rem 0.75rem; width: 180px; vertical-align: top;
+                     background: var(--term-header-bg); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.9rem; }
+.term-contents td { padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border); }
+.table-separator td { padding: 0; height: 0.5rem; border: none; }
+
+/* Legacy summary table */
 .term-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
 .term-table th, .term-table td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .term-table th { font-weight: 600; background: var(--nav-bg); }
-.breadcrumb { margin-bottom: 1rem; font-size: 0.9rem; }
-.narrative { margin-bottom: 2rem; }
-.sidecar-content { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+/* Concept hierarchy tree */
+.concept-list { list-style: none; padding-left: 0; }
+.concept-list ul { list-style: none; padding-left: 1.5rem; }
+.concept-list li { margin: 0.15rem 0; }
+.concept-list .tree-label { font-weight: 500; }
+.concept-list .tree-desc { color: #666; font-size: 0.9em; margin-left: 0.5rem; }
+[data-theme="dark"] .concept-list .tree-desc { color: #aaa; }
+.btn-hierarchy { background: var(--accent); color: #fff; border: none; cursor: pointer;
+                 padding: 0.3rem 0.8rem; border-radius: 3px; font-size: 0.85rem; margin: 0.5rem 0.25rem 0.75rem 0; }
+.btn-hierarchy:hover { opacity: 0.9; }
+
+/* SHACL shapes */
+.shape-block { margin-bottom: 1.5rem; }
+.shape-block h3 { font-size: 1rem; }
+.shape-constraints { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+.shape-constraints th, .shape-constraints td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border); }
+.shape-constraints th { background: var(--term-header-bg); font-weight: 600; font-size: 0.9rem; }
+
+/* Serializations */
+.serialization-links { list-style: none; padding: 0; }
+.serialization-links li { display: inline-block; margin-right: 1rem; }
+.serialization-links a { display: inline-block; padding: 0.3rem 0.8rem; border: 1px solid var(--accent); border-radius: 3px; text-decoration: none; }
+.serialization-links a:hover { background: var(--accent); color: #fff; }
+
+.iri { margin-bottom: 1rem; }
 """
 
 
@@ -45,27 +198,43 @@ def render_site(manifest: dict, output_dir: Path) -> None:
     """Render the full static site from a manifest dict."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    prefix = manifest["metadata"]["prefix"]
+    namespace = manifest["metadata"]["namespace"]
+    all_classes = manifest["classes"]
+    all_properties = manifest["properties"]
+
     env = Environment(
         loader=PackageLoader("blathers", "templates"),
         autoescape=select_autoescape(["html"]),
     )
 
+    # Register custom filters
+    env.filters["prefixed"] = lambda iri: _prefixed(iri, prefix, namespace)
+    env.filters["local_name"] = _local_name
+    env.filters["term_anchor"] = lambda iri: _term_anchor(iri, namespace)
+    env.filters["term_link"] = lambda iri: Markup(_term_link(iri, prefix, namespace, all_classes, all_properties))
+
     # Write manifest JSON
     (output_dir / "site-data.json").write_text(json.dumps(manifest, indent=2))
 
-    # Write CSS
+    # Write CSS to assets (for term pages that link externally)
     assets_dir = output_dir / "assets"
     assets_dir.mkdir(exist_ok=True)
     (assets_dir / "style.css").write_text(DEFAULT_CSS)
 
+    # Build hierarchy tree
+    hierarchy = _build_hierarchy(all_classes, namespace)
+
     # Common template context
     ctx = {
         "metadata": manifest["metadata"],
-        "classes": manifest["classes"],
-        "properties": manifest["properties"],
+        "classes": all_classes,
+        "properties": all_properties,
         "shapes": manifest["shapes"],
         "sections": manifest["sections"],
         "conneg": manifest.get("conneg", {}),
+        "hierarchy": hierarchy,
+        "inline_css": DEFAULT_CSS,
     }
 
     # Render index
@@ -76,7 +245,7 @@ def render_site(manifest: dict, output_dir: Path) -> None:
     classes_dir = output_dir / "classes"
     classes_dir.mkdir(exist_ok=True)
     term_tpl = env.get_template("term.html.j2")
-    for cls in manifest["classes"]:
+    for cls in all_classes:
         html = term_tpl.render(
             base_path="../",
             term=cls,
@@ -88,7 +257,7 @@ def render_site(manifest: dict, output_dir: Path) -> None:
     # Render property pages
     props_dir = output_dir / "properties"
     props_dir.mkdir(exist_ok=True)
-    for prop in manifest["properties"]:
+    for prop in all_properties:
         html = term_tpl.render(
             base_path="../",
             term=prop,

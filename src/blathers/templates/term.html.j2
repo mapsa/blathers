@@ -1,46 +1,61 @@
 {% extends "base.html.j2" %}
 
-{% block title %}{{ term.local_name }} — {{ metadata.title }}{% endblock %}
+{% block title %}{{ term.prefixed_name }} — {{ metadata.title }}{% endblock %}
 
 {% block content %}
 <div class="term-page">
     <nav class="breadcrumb">
         <a href="{{ base_path }}index.html">{{ metadata.title }}</a> &rsaquo;
         <a href="{{ base_path }}index.html#{{ term_type }}">{{ term_type | capitalize }}</a> &rsaquo;
-        {{ term.local_name }}
+        {{ term.prefixed_name }}
     </nav>
 
-    <h1>{{ term.label or term.local_name }}</h1>
-    <p class="iri"><code>{{ term.iri }}</code></p>
+    <h1>{{ term.label or term.prefixed_name }}</h1>
 
-    {% if term.comment %}
-    <p class="description">{{ term.comment }}</p>
-    {% endif %}
+    <table class="term-contents">
+        <tr><th>Term</th><td><code>{{ term.prefixed_name }}</code></td></tr>
+        {% if term.label %}<tr><th>Label</th><td>{{ term.label }}</td></tr>{% endif %}
+        <tr><th>IRI</th><td><code>{{ term.iri }}</code></td></tr>
 
-    {% if term.superclasses is defined and term.superclasses %}
-    <h2>Superclasses</h2>
-    <ul>{% for sc in term.superclasses %}<li>{{ sc }}</li>{% endfor %}</ul>
-    {% endif %}
+        {# Class-specific rows #}
+        {% if term.superclasses is defined %}
+        <tr><th>Type</th><td><code>rdfs:Class</code></td></tr>
+        {% if term.superclasses %}
+        <tr><th>Broader/Parent types</th><td>
+            {% for sc in term.superclasses %}{{ sc | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+        </td></tr>
+        {% endif %}
+        {% if term.subclasses %}
+        <tr><th>Narrower/Child types</th><td>
+            {% for sc in term.subclasses %}{{ sc | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+        </td></tr>
+        {% endif %}
+        {% if term.subject_of is defined and term.subject_of %}
+        <tr><th>Subject of</th><td>
+            {% for p in term.subject_of %}{{ p | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+        </td></tr>
+        {% endif %}
+        {% if term.object_of is defined and term.object_of %}
+        <tr><th>Object of</th><td>
+            {% for p in term.object_of %}{{ p | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+        </td></tr>
+        {% endif %}
+        {% endif %}
 
-    {% if term.subclasses is defined and term.subclasses %}
-    <h2>Subclasses</h2>
-    <ul>{% for sc in term.subclasses %}<li>{{ sc }}</li>{% endfor %}</ul>
-    {% endif %}
+        {# Property-specific rows #}
+        {% if term.prop_type is defined %}
+        <tr><th>Type</th><td><code>{{ term.prop_type }}</code></td></tr>
+        {% if term.domain %}<tr><th>Domain</th><td>{{ term.domain | term_link }}</td></tr>{% endif %}
+        {% if term.range %}<tr><th>Range</th><td>{{ term.range | term_link }}</td></tr>{% endif %}
+        {% endif %}
 
-    {% if term.domain is defined and term.domain %}
-    <h2>Domain</h2>
-    <p>{{ term.domain }}</p>
-    {% endif %}
-
-    {% if term.range is defined and term.range %}
-    <h2>Range</h2>
-    <p>{{ term.range }}</p>
-    {% endif %}
+        {% if term.comment %}<tr><th>Definition</th><td>{{ term.comment }}</td></tr>{% endif %}
+    </table>
 
     {% if term.sidecar %}
-    <section class="sidecar-content">
+    <div class="sidecar-content">
         {{ term.sidecar | safe }}
-    </section>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,24 @@
+ontology: ontology/my-ontology.ttl
+shacl:
+  - shacl/shapes.ttl
+examples:
+  - examples/*.ttl
+sidecars: sidecars/
+figures: figures/
+output: dist/
+
+metadata:
+  title: "My Ontology"
+  version: "0.1.0"
+  license: MIT
+  namespace: "http://example.org/my-ontology#"
+  prefix: myont
+
+validation:
+  fail_on: error
+  rules:
+    shacl: true
+    consistency: true
+    completeness: true
+    conventions: true
+    overlap: true

@@ -2,68 +2,232 @@
 
 {% block content %}
 <div class="index-page">
+
+    {# ── Metadata Header ── #}
+    <h1>{{ metadata.title }}</h1>
+    <dl class="metadata-dl">
+        <div class="metadata-row"><dt>Version</dt><dd>{{ metadata.version }}</dd></div>
+        <div class="metadata-row"><dt>Namespace</dt><dd><code>{{ metadata.namespace }}</code></dd></div>
+        <div class="metadata-row"><dt>Prefix</dt><dd><code>{{ metadata.prefix }}</code></dd></div>
+        {% if metadata.license %}
+        <div class="metadata-row"><dt>License</dt><dd>{{ metadata.license }}</dd></div>
+        {% endif %}
+        {% if conneg.formats %}
+        <div class="metadata-row"><dt>Serializations</dt><dd>
+            {% for fmt in conneg.formats %}
+                {% if fmt == 'ttl' %}<a href="ontology.ttl">Turtle</a>{% endif %}
+                {% if fmt == 'jsonld' %}<a href="ontology.jsonld">JSON-LD</a>{% endif %}
+                {% if fmt == 'nt' %}<a href="ontology.nt">N-Triples</a>{% endif %}
+                {% if fmt == 'owl' %}<a href="ontology.owl">RDF/XML</a>{% endif %}
+                {% if not loop.last %} | {% endif %}
+            {% endfor %}
+        </dd></div>
+        {% endif %}
+    </dl>
+
+    {# ── Table of Contents ── #}
+    <nav class="toc" id="toc">
+        <h2>Table of Contents</h2>
+        <ol>
+            {% if sections %}
+            {% for section in sections %}
+            <li><a href="#section-{{ section.filename | replace('.md','') | replace('_','') }}">{{ section.section | capitalize }}</a></li>
+            {% endfor %}
+            {% endif %}
+            {% if classes %}<li><a href="#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
+            {% if classes %}<li><a href="#classes">Classes</a>
+                <ol>
+                {% for cls in classes %}
+                    <li><a href="#{{ cls.local_name }}">{{ cls.prefixed_name }}</a></li>
+                {% endfor %}
+                </ol>
+            </li>{% endif %}
+            {% if properties %}<li><a href="#properties">Properties</a>
+                <ol>
+                {% for prop in properties %}
+                    <li><a href="#{{ prop.local_name }}">{{ prop.prefixed_name }}</a></li>
+                {% endfor %}
+                </ol>
+            </li>{% endif %}
+            {% if shapes %}<li><a href="#shapes">SHACL Shapes</a></li>{% endif %}
+            {% if conneg.formats %}<li><a href="#serializations">Serializations</a></li>{% endif %}
+        </ol>
+    </nav>
+
+    {# ── Narrative Sections ── #}
     {% for section in sections %}
     <section class="narrative" id="section-{{ section.filename | replace('.md','') | replace('_','') }}">
         {{ section.html | safe }}
     </section>
     {% endfor %}
 
+    {# ── Concept Hierarchy ── #}
+    {% if classes %}
+    <section id="concept-hierarchy">
+        <h2>Concept Hierarchy</h2>
+        <div>
+            <button class="btn-hierarchy" id="expand-all" type="button">Expand All</button>
+            <button class="btn-hierarchy" id="collapse-all" type="button">Collapse All</button>
+        </div>
+        {% macro render_tree(nodes) %}
+        <ul class="concept-list">
+            {% for node in nodes %}
+            <li>
+                {% if node.children %}
+                <details open>
+                    <summary>
+                        <a href="#{{ node.local_name }}" class="tree-label">{{ node.prefixed_name }}</a>
+                        {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
+                    </summary>
+                    {{ render_tree(node.children) }}
+                </details>
+                {% else %}
+                <a href="#{{ node.local_name }}" class="tree-label">{{ node.prefixed_name }}</a>
+                {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endmacro %}
+        {{ render_tree(hierarchy) }}
+    </section>
+    {% endif %}
+
+    {# ── Classes ── #}
+    {% if classes %}
     <section id="classes">
         <h2>Classes</h2>
-        <table class="term-table">
-            <thead><tr><th>Class</th><th>Label</th><th>Description</th></tr></thead>
-            <tbody>
-            {% for cls in classes %}
-            <tr>
-                <td><a href="classes/{{ cls.local_name }}.html">{{ cls.local_name }}</a></td>
-                <td>{{ cls.label or '' }}</td>
-                <td>{{ cls.comment or '' }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% for cls in classes %}
+        <div class="term-def" id="{{ cls.local_name }}">
+            <h3>{{ cls.prefixed_name }}
+                <a href="classes/{{ cls.local_name }}.html" title="Standalone page" style="font-size:0.75em; font-weight:normal;">&#x1f517;</a>
+            </h3>
+            <table class="term-contents">
+                <tr><th>Term</th><td><code>{{ cls.prefixed_name }}</code></td></tr>
+                {% if cls.label %}<tr><th>Label</th><td>{{ cls.label }}</td></tr>{% endif %}
+                <tr><th>IRI</th><td><code>{{ cls.iri }}</code></td></tr>
+                <tr><th>Type</th><td><code>rdfs:Class</code></td></tr>
+                {% if cls.superclasses %}
+                <tr><th>Broader/Parent types</th><td>
+                    {% for sc in cls.superclasses %}{{ sc | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td></tr>
+                {% endif %}
+                {% if cls.subclasses %}
+                <tr><th>Narrower/Child types</th><td>
+                    {% for sc in cls.subclasses %}{{ sc | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td></tr>
+                {% endif %}
+                {% if cls.subject_of %}
+                <tr><th>Subject of</th><td>
+                    {% for p in cls.subject_of %}{{ p | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td></tr>
+                {% endif %}
+                {% if cls.object_of %}
+                <tr><th>Object of</th><td>
+                    {% for p in cls.object_of %}{{ p | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td></tr>
+                {% endif %}
+                {% if cls.comment %}<tr><th>Definition</th><td>{{ cls.comment }}</td></tr>{% endif %}
+            </table>
+            {% if cls.sidecar %}
+            <div class="sidecar-content">{{ cls.sidecar | safe }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
     </section>
+    {% endif %}
 
+    {# ── Properties ── #}
+    {% if properties %}
     <section id="properties">
         <h2>Properties</h2>
-        <table class="term-table">
-            <thead><tr><th>Property</th><th>Domain</th><th>Range</th></tr></thead>
-            <tbody>
-            {% for prop in properties %}
-            <tr>
-                <td><a href="properties/{{ prop.local_name }}.html">{{ prop.local_name }}</a></td>
-                <td>{{ prop.domain or '' }}</td>
-                <td>{{ prop.range or '' }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% for prop in properties %}
+        <div class="term-def" id="{{ prop.local_name }}">
+            <h3>{{ prop.prefixed_name }}
+                <a href="properties/{{ prop.local_name }}.html" title="Standalone page" style="font-size:0.75em; font-weight:normal;">&#x1f517;</a>
+            </h3>
+            <table class="term-contents">
+                <tr><th>Term</th><td><code>{{ prop.prefixed_name }}</code></td></tr>
+                {% if prop.label %}<tr><th>Label</th><td>{{ prop.label }}</td></tr>{% endif %}
+                <tr><th>IRI</th><td><code>{{ prop.iri }}</code></td></tr>
+                <tr><th>Type</th><td><code>{{ prop.prop_type }}</code></td></tr>
+                {% if prop.domain %}<tr><th>Domain</th><td>{{ prop.domain | term_link }}</td></tr>{% endif %}
+                {% if prop.range %}<tr><th>Range</th><td>{{ prop.range | term_link }}</td></tr>{% endif %}
+                {% if prop.comment %}<tr><th>Definition</th><td>{{ prop.comment }}</td></tr>{% endif %}
+            </table>
+            {% if prop.sidecar %}
+            <div class="sidecar-content">{{ prop.sidecar | safe }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
     </section>
+    {% endif %}
 
+    {# ── SHACL Shapes ── #}
     {% if shapes %}
     <section id="shapes">
         <h2>SHACL Shapes</h2>
-        <ul>
         {% for shape in shapes %}
-            <li><strong>{{ shape.local_name }}</strong> → targets {{ shape.target_class or 'unknown' }}</li>
+        <div class="shape-block" id="{{ shape.local_name }}">
+            <h3>{{ shape.prefixed_name }}</h3>
+            {% if shape.target_class %}
+            <p>Target class: {{ shape.target_class | term_link }}</p>
+            {% endif %}
+            {% if shape.constraints %}
+            <table class="shape-constraints">
+                <thead><tr><th>Path</th><th>Min</th><th>Max</th><th>Class</th></tr></thead>
+                <tbody>
+                {% for c in shape.constraints %}
+                <tr>
+                    <td>{% if c.path %}{{ c.path | term_link }}{% endif %}</td>
+                    <td>{{ c.min_count if c.min_count is not none else '' }}</td>
+                    <td>{{ c.max_count if c.max_count is not none else '' }}</td>
+                    <td>{% if c.node_class %}{{ c.node_class | term_link }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {# ── Serializations ── #}
+    {% if conneg.formats %}
+    <section id="serializations">
+        <h2>Serializations</h2>
+        <ul class="serialization-links">
+        {% for fmt in conneg.formats %}
+            {% if fmt == 'ttl' %}<li><a href="ontology.ttl">Turtle (.ttl)</a></li>{% endif %}
+            {% if fmt == 'jsonld' %}<li><a href="ontology.jsonld">JSON-LD (.jsonld)</a></li>{% endif %}
+            {% if fmt == 'nt' %}<li><a href="ontology.nt">N-Triples (.nt)</a></li>{% endif %}
+            {% if fmt == 'owl' %}<li><a href="ontology.owl">RDF/XML (.owl)</a></li>{% endif %}
         {% endfor %}
         </ul>
     </section>
     {% endif %}
 
-    {% if conneg.formats %}
-    <section id="serializations">
-        <h2>Serializations</h2>
-        <ul>
-        {% for fmt in conneg.formats %}
-            {% if fmt == 'ttl' %}<li><a href="ontology.ttl">Turtle</a></li>
-            {% elif fmt == 'jsonld' %}<li><a href="ontology.jsonld">JSON-LD</a></li>
-            {% elif fmt == 'nt' %}<li><a href="ontology.nt">N-Triples</a></li>
-            {% elif fmt == 'owl' %}<li><a href="ontology.owl">RDF/XML</a></li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    </section>
-    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+    var expandBtn = document.getElementById('expand-all');
+    var collapseBtn = document.getElementById('collapse-all');
+    if (expandBtn) {
+        expandBtn.addEventListener('click', function(){
+            var details = document.querySelectorAll('#concept-hierarchy details');
+            for (var i = 0; i < details.length; i++) details[i].open = true;
+        });
+    }
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', function(){
+            var details = document.querySelectorAll('#concept-hierarchy details');
+            for (var i = 0; i < details.length; i++) details[i].open = false;
+        });
+    }
+})();
+</script>
 {% endblock %}
