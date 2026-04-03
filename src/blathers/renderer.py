@@ -178,15 +178,15 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 /* ReSpec-style metadata header */
 .respec-header { margin-bottom: 2rem; }
 .respec-header h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-.respec-header .subtitle { font-size: 1.2rem; color: #666; margin-bottom: 0.75rem; }
+.respec-header .subtitle { font-size: 1.1rem; color: #666; margin-bottom: 0.25rem; }
 [data-theme="dark"] .respec-header .subtitle { color: #aaa; }
-.respec-header .doc-status { color: var(--accent); font-size: 1.1rem; margin-bottom: 1.5rem; }
-.respec-header dl { margin: 0 0 1.5rem; }
-.respec-header dt { font-weight: 700; margin-top: 0.6rem; margin-bottom: 0.1rem; }
-.respec-header dd { margin: 0 0 0.1rem 1.5rem; }
-.respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.respec-header .doc-status { color: var(--accent); font-size: 1rem; margin-bottom: 1rem; }
+.respec-header dl { margin: 0 0 0.75rem; display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 1rem; align-items: baseline; }
+.respec-header dt { font-weight: 700; white-space: nowrap; }
+.respec-header dd { margin: 0; }
+.respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
 [data-theme="dark"] .respec-header .copyright { color: #aaa; }
-.respec-header .contributors { font-size: 0.9rem; margin-top: 0.75rem; }
+.respec-header .contributors { font-size: 0.9rem; margin-top: 0.5rem; }
 
 /* Table of Contents (inline fallback) */
 .toc { background: var(--toc-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
