@@ -28,8 +28,25 @@
                 {% endfor %}
                 </ul>
             </li>{% endif %}
-            {% if shapes %}<li><a href="#shapes">SHACL Shapes <span class="toc-count">{{ shapes | length }}</span></a></li>{% endif %}
-            {% if conneg.formats %}<li><a href="#serializations">Serializations <span class="toc-count">{{ conneg.formats | length }}</span></a></li>{% endif %}
+            {% if shapes %}<li>
+                <a href="#shapes" class="toc-section-link">SHACL Shapes <span class="toc-count">{{ shapes | length }}</span></a>
+                <ul class="toc-sub">
+                {% for shape in shapes %}
+                    <li><a href="#{{ shape.local_name }}">{{ shape.local_name }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>{% endif %}
+            {% if conneg.formats %}<li>
+                <a href="#serializations" class="toc-section-link">Serializations <span class="toc-count">{{ conneg.formats | length }}</span></a>
+                <ul class="toc-sub">
+                {% for fmt in conneg.formats %}
+                    {% if fmt == 'ttl' %}<li><a href="ontology.ttl">Turtle</a></li>{% endif %}
+                    {% if fmt == 'jsonld' %}<li><a href="ontology.jsonld">JSON-LD</a></li>{% endif %}
+                    {% if fmt == 'nt' %}<li><a href="ontology.nt">N-Triples</a></li>{% endif %}
+                    {% if fmt == 'owl' %}<li><a href="ontology.owl">RDF/XML</a></li>{% endif %}
+                {% endfor %}
+                </ul>
+            </li>{% endif %}
         </ul>
     </nav>
 
