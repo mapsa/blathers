@@ -21,10 +21,15 @@ KNOWN_PREFIXES = {
 }
 
 
-def _prefixed(iri: str, prefix: str, namespace: str) -> str:
+def _prefixed(iri: str, prefix: str, namespace: str, extra_prefixes: dict[str, str] | None = None) -> str:
     """Convert a full IRI to prefix:LocalName."""
     if iri.startswith(namespace):
         return f"{prefix}:{iri[len(namespace):]}"
+    # Check import prefixes
+    if extra_prefixes:
+        for ns, pfx in extra_prefixes.items():
+            if iri.startswith(ns):
+                return f"{pfx}:{iri[len(ns):]}"
     for ns, pfx in KNOWN_PREFIXES.items():
         if iri.startswith(ns):
             return f"{pfx}:{iri[len(ns):]}"
@@ -45,9 +50,9 @@ def _term_anchor(iri: str, namespace: str) -> str:
     return _local_name(iri)
 
 
-def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties: list) -> str:
+def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties: list, extra_prefixes: dict[str, str] | None = None) -> str:
     """Return an HTML anchor link for a term IRI."""
-    pname = _prefixed(iri, prefix, namespace)
+    pname = _prefixed(iri, prefix, namespace, extra_prefixes)
     anchor = _term_anchor(iri, namespace)
     # Check if the term is in our vocabulary
     all_iris = {c["iri"] for c in classes} | {p["iri"] for p in properties}
@@ -383,16 +388,21 @@ def render_site(manifest: dict, output_dir: Path) -> None:
     all_classes = manifest["classes"]
     all_properties = manifest["properties"]
 
+    # Build prefix map from imports
+    extra_prefixes: dict[str, str] = {}
+    for imp in manifest.get("imports", []):
+        extra_prefixes[imp["uri"]] = imp["prefix"]
+
     env = Environment(
         loader=PackageLoader("blathers", "templates"),
         autoescape=select_autoescape(["html"]),
     )
 
     # Register custom filters
-    env.filters["prefixed"] = lambda iri: _prefixed(iri, prefix, namespace)
+    env.filters["prefixed"] = lambda iri: _prefixed(iri, prefix, namespace, extra_prefixes)
     env.filters["local_name"] = _local_name
     env.filters["term_anchor"] = lambda iri: _term_anchor(iri, namespace)
-    env.filters["term_link"] = lambda iri: Markup(_term_link(iri, prefix, namespace, all_classes, all_properties))
+    env.filters["term_link"] = lambda iri: Markup(_term_link(iri, prefix, namespace, all_classes, all_properties, extra_prefixes))
 
     # Write manifest JSON
     (output_dir / "site-data.json").write_text(json.dumps(manifest, indent=2))

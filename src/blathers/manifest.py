@@ -168,6 +168,10 @@ def build_manifest(
             "formats": config.conneg.formats,
             "base_uri": config.conneg.base_uri,
         },
+        "imports": [
+            {"uri": imp.uri, "prefix": imp.prefix}
+            for imp in config.imports
+        ],
         "validation_summary": {
             "errors": error_count,
             "warnings": warning_count,
