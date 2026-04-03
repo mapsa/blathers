@@ -14,7 +14,7 @@
     <header>
         <nav>
             <a href="{{ base_path }}index.html" class="logo">{{ metadata.title }}</a>
-            <span class="version">v{{ metadata.version }}</span>
+            <span class="version">v{{ metadata.version }}{% if metadata.status %} <span class="status-label status-{{ metadata.status | lower | replace(' ', '-') }}">{{ metadata.status }}</span>{% endif %}</span>
             <label class="theme-switch" aria-label="Toggle theme">
                 <input type="checkbox" id="theme-toggle">
                 <span class="theme-slider">
@@ -24,9 +24,6 @@
             </label>
         </nav>
     </header>
-    {% if metadata.status %}
-    <div class="status-banner status-{{ metadata.status | lower | replace(' ', '-') }}">{{ metadata.status }}</div>
-    {% endif %}
     {% block body_content %}
     <main>
         {% block content %}{% endblock %}
