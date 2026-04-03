@@ -423,16 +423,13 @@
                 if (th && td) info[th.textContent.trim()] = td.innerHTML;
             }
 
-            /* Build detail panel HTML */
+            /* Build detail panel HTML — focus on what the tree doesn't show */
             var html = '<h3>' + labelText + '</h3>';
-            if (info['IRI']) html += '<div class="detail-iri">' + info['IRI'] + '</div>';
-            if (info['Type']) html += '<div class="detail-row"><dt>Type</dt><dd>' + info['Type'] + '</dd></div>';
             if (info['Definition']) html += '<div class="detail-def">' + info['Definition'] + '</div>';
-            if (info['Broader/Parent types']) html += '<div class="detail-row"><dt>Parent types</dt><dd>' + info['Broader/Parent types'] + '</dd></div>';
-            if (info['Narrower/Child types']) html += '<div class="detail-row"><dt>Child types</dt><dd>' + info['Narrower/Child types'] + '</dd></div>';
-            if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
             if (info['Subject of']) html += '<div class="detail-row"><dt>Subject of</dt><dd>' + info['Subject of'] + '</dd></div>';
             if (info['Object of']) html += '<div class="detail-row"><dt>Object of</dt><dd>' + info['Object of'] + '</dd></div>';
+            if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
+            if (info['IRI']) html += '<div class="detail-iri">' + info['IRI'] + '</div>';
             html += '<a href="#' + termId + '" class="detail-link">Go to full definition &darr;</a>';
 
             detailPanel.innerHTML = html;
@@ -453,8 +450,15 @@
     });
     document.addEventListener('click', function(e){
         var link = e.target.closest('a[href^="#"]');
-        if (link) {
-            var id = link.getAttribute('href').slice(1);
+        if (!link) return;
+        /* Don't interfere with tree-term clicks (handled separately) */
+        if (link.classList.contains('tree-term')) return;
+        var id = link.getAttribute('href').slice(1);
+        var target = document.getElementById(id);
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            history.pushState(null, '', '#' + id);
             setTimeout(function(){ highlightTerm(id); }, 300);
         }
     });
