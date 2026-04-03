@@ -140,7 +140,6 @@
     {% if classes %}
     {% macro render_tree(nodes) %}
     {% set class_nodes = nodes | rejectattr('is_individual') | list %}
-    {% set individual_nodes = nodes | selectattr('is_individual') | list %}
     <ul>
         {% for node in class_nodes %}
         <li>
@@ -151,21 +150,6 @@
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
-        {% if individual_nodes %}
-        {% for node in individual_nodes %}
-            <li class="individual-item">
-                <a href="#{{ node.local_name }}" class="tree-term tree-individual"
-                   data-term-id="{{ node.local_name }}"
-                   data-is-individual="true"
-                   data-label="{{ node.label or node.local_name }}"
-                   data-iri="{{ node.iri }}"
-                   {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
-                   {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
-                   {% if node.comment %}title="{{ node.comment }}"{% endif %}
-                >{{ node.label or node.local_name }}</a>
-            </li>
-        {% endfor %}
-        {% endif %}
     </ul>
     {% endmacro %}
     <section id="concept-hierarchy">
@@ -210,7 +194,7 @@
                 {% if cls.instances %}
                 <tr><th>Instances</th><td>
                     {% for ind in cls.instances %}
-                    <a href="#{{ ind.local_name }}" class="instance-chip">{{ ind.label or ind.local_name }}</a>{% if not loop.last %} {% endif %}
+                    <span class="instance-chip"{% if ind.comment %} title="{{ ind.comment }}"{% endif %}>{{ ind.label or ind.local_name }}</span>{% if not loop.last %} {% endif %}
                     {% endfor %}
                 </td></tr>
                 {% endif %}
@@ -371,48 +355,12 @@
         treeTerms[i].addEventListener('click', function(e){
             e.preventDefault();
             var termId = this.getAttribute('data-term-id');
-            var isIndividual = this.getAttribute('data-is-individual') === 'true';
 
             /* Update selected state */
             for (var j = 0; j < treeTerms.length; j++) treeTerms[j].classList.remove('selected');
             this.classList.add('selected');
 
             if (!detailPanel) return;
-
-            if (isIndividual) {
-                /* Build detail panel from data attributes for individuals */
-                var indLabel = this.getAttribute('data-label') || termId;
-                var indIri = this.getAttribute('data-iri') || '';
-                var indComment = this.getAttribute('data-comment') || '';
-                var indTypes = this.getAttribute('data-types') || '';
-
-                /* Helper to shorten IRIs to prefixed form */
-                function shorten(iri) {
-                    var ns = '{{ metadata.namespace }}';
-                    var pfx = '{{ metadata.prefix }}';
-                    if (iri.indexOf(ns) === 0) return pfx + ':' + iri.slice(ns.length);
-                    return iri;
-                }
-
-                var html = '<h3>' + indLabel + '</h3>';
-                html += '<div class="detail-row"><dt>Type</dt><dd>Named Individual</dd></div>';
-                if (indIri) html += '<div class="detail-iri"><code>' + shorten(indIri) + '</code></div>';
-                if (indComment) html += '<div class="detail-def">' + indComment + '</div>';
-                if (indTypes) {
-                    var typeList = indTypes.split(',');
-                    html += '<div class="detail-row"><dt>Instance of</dt><dd>';
-                    for (var t = 0; t < typeList.length; t++) {
-                        if (t > 0) html += ', ';
-                        var shortType = shorten(typeList[t]);
-                        var typeId = typeList[t].split('#').pop().split('/').pop();
-                        html += '<a href="#' + typeId + '">' + shortType + '</a>';
-                    }
-                    html += '</dd></div>';
-                }
-
-                detailPanel.innerHTML = html;
-                return;
-            }
 
             var termDef = document.getElementById(termId);
             if (!termDef) return;

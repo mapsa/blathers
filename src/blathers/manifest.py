@@ -78,6 +78,7 @@ def build_manifest(
                 "iri": ind.iri,
                 "local_name": ind.local_name,
                 "label": ind.label,
+                "comment": ind.comment,
                 "prefixed_name": _prefixed_name(ind.iri, prefix, namespace),
             })
 

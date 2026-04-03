@@ -298,24 +298,11 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
                               border: 1px solid var(--border); }
 .hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-/* Individual nodes — lighter pill style, dashed border */
-.tree-individual { font-weight: 400 !important; font-style: italic !important; background: transparent !important;
-                   border: 1px dashed var(--border) !important; color: var(--text-secondary) !important; }
-.tree-individual:hover { background: var(--accent) !important; color: #fff !important;
-                         border-color: var(--accent) !important; font-style: italic !important; }
+/* Instance chips in definition tables */
 
-/* Individual items */
-.individual-item { position: relative; padding-left: 2rem; display: list-item; }
-.individual-item::before { content: ""; position: absolute; left: 0.6rem; top: 0; bottom: 0;
-                            border-left: 2px dotted var(--accent); opacity: 0.3; }
-.individual-item:last-child::before { bottom: calc(100% - 1.1rem); }
-.individual-item::after { content: ""; position: absolute; left: 0.6rem; top: 1.1rem;
-                           width: 1rem; border-top: 2px dotted var(--accent); opacity: 0.3; }
 .instance-chip { display: inline-block; padding: 0.15rem 0.6rem; background: var(--code-bg);
                  border-radius: 6px; font-size: 0.85em; margin: 0.1rem 0.2rem;
-                 border: 1px dashed var(--border); color: var(--text-secondary);
-                 text-decoration: none; cursor: pointer; transition: all 0.15s; }
-.instance-chip:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+                 border: 1px solid var(--border); color: var(--text-secondary); cursor: default; }
 
 /* Tooltip */
 .hierarchy-tree .tree-term[title] { cursor: pointer; }
