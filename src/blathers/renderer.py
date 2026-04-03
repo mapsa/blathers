@@ -304,15 +304,8 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .tree-individual:hover { background: var(--accent) !important; color: #fff !important;
                          border-color: var(--accent) !important; font-style: italic !important; }
 
-/* Instance badge on class chips */
-.instance-badge { display: inline-block; background: var(--accent); color: #fff; font-size: 0.7em;
-                  padding: 0.05rem 0.35rem; border-radius: 8px; font-weight: 600; margin-left: 0.3rem;
-                  vertical-align: middle; line-height: 1.3; }
-
-/* Individual items — hidden by default, shown when parent is toggled */
-.individual-item { display: none; }
-.individual-item.show { display: list-item; }
-.individual-item { position: relative; padding-left: 2rem; }
+/* Individual items */
+.individual-item { position: relative; padding-left: 2rem; display: list-item; }
 .individual-item::before { content: ""; position: absolute; left: 0.6rem; top: 0; bottom: 0;
                             border-left: 2px dotted var(--accent); opacity: 0.3; }
 .individual-item:last-child::before { bottom: calc(100% - 1.1rem); }
