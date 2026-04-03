@@ -263,30 +263,38 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 /* Hierarchy tree — file-tree style */
 .hierarchy-tree { list-style: none; padding: 0; margin: 0; font-size: 0.95rem; }
 .hierarchy-tree ul { list-style: none; padding: 0; margin: 0; }
-.hierarchy-tree li { position: relative; padding-left: 1.5rem; }
+.hierarchy-tree li { position: relative; padding-left: 2rem; min-height: 2rem; display: flex; flex-wrap: wrap; align-items: center; }
 .hierarchy-tree > ul > li { padding-left: 0; } /* root items no indent */
 
 /* Vertical connector lines */
-.hierarchy-tree li li::before { content: ""; position: absolute; left: 0.5rem; top: 0; bottom: 0;
-                                 border-left: 1px solid var(--border); }
+.hierarchy-tree li li::before { content: ""; position: absolute; left: 0.6rem; top: 0; bottom: 0;
+                                 border-left: 2px solid var(--accent); opacity: 0.25; }
 .hierarchy-tree li li:last-child::before { bottom: 50%; }
 
 /* Horizontal branch lines */
-.hierarchy-tree li li::after { content: ""; position: absolute; left: 0.5rem; top: 50%;
-                                width: 0.75rem; border-top: 1px solid var(--border); }
+.hierarchy-tree li li::after { content: ""; position: absolute; left: 0.6rem; top: 50%;
+                                width: 1rem; border-top: 2px solid var(--accent); opacity: 0.25; }
 
-/* Term chips */
-.hierarchy-tree .tree-term { display: inline-block; padding: 0.15rem 0.6rem; margin: 0.15rem 0;
+/* Class chips — bold, prominent */
+.hierarchy-tree .tree-term { display: inline-block; padding: 0.25rem 0.75rem; margin: 0.2rem 0;
                               border-radius: 6px; text-decoration: none; color: var(--fg);
-                              font-weight: 500; font-size: 0.9rem; transition: all 0.15s;
-                              position: relative; z-index: 1; }
-.hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; }
+                              font-weight: 600; font-size: 0.9rem; transition: all 0.15s;
+                              position: relative; z-index: 1; background: var(--code-bg);
+                              border: 1px solid transparent; }
+.hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-/* Individual nodes in hierarchy */
-.tree-individual { font-style: italic; opacity: 0.75; font-weight: 400; }
-.tree-individual:hover { opacity: 1; }
-.instance-chip { display: inline-block; padding: 0.1rem 0.5rem; background: var(--code-bg);
-                 border-radius: 3px; font-size: 0.9em; margin: 0.1rem 0; }
+/* Individual nodes — lighter pill style with dot indicator */
+.tree-individual { font-weight: 400 !important; font-style: normal !important; background: transparent !important;
+                   border: 1px dashed var(--border) !important; color: var(--text-secondary) !important; }
+.tree-individual::before { content: ""; display: inline-block; width: 6px; height: 6px;
+                           border-radius: 50%; background: var(--accent); opacity: 0.5;
+                           margin-right: 0.4rem; vertical-align: middle; }
+.tree-individual:hover { background: var(--accent) !important; color: #fff !important;
+                         border-color: var(--accent) !important; }
+.tree-individual:hover::before { background: #fff; opacity: 1; }
+.instance-chip { display: inline-block; padding: 0.15rem 0.6rem; background: var(--code-bg);
+                 border-radius: 6px; font-size: 0.85em; margin: 0.1rem 0.2rem;
+                 border: 1px dashed var(--border); color: var(--text-secondary); }
 
 /* Tooltip */
 .hierarchy-tree .tree-term[title] { cursor: pointer; }
