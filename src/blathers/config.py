@@ -15,12 +15,28 @@ class ImportConfig(BaseModel):
     path: Optional[str] = None
 
 
+class PersonConfig(BaseModel):
+    name: str
+    affiliation: Optional[str] = None
+    url: Optional[str] = None
+
+
 class MetadataConfig(BaseModel):
     title: str
     version: str
     license: str
     namespace: str
     prefix: str
+    # Optional fields for ReSpec-style header
+    description: Optional[str] = None
+    status: Optional[str] = None
+    date: Optional[str] = None
+    editors: list[PersonConfig] = Field(default_factory=list)
+    authors: list[PersonConfig] = Field(default_factory=list)
+    contributors: list[str] = Field(default_factory=list)
+    repository: Optional[str] = None
+    previous_version: Optional[str] = None
+    copyright: Optional[str] = None
 
 
 class ValidationRules(BaseModel):

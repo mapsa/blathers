@@ -106,7 +106,7 @@ def _build_hierarchy(classes: list[dict], namespace: str) -> list[dict]:
     return tree
 
 
-# Inline CSS — ReSpec-style, works with file:// protocol
+# Inline CSS — ReSpec-style two-column layout, works with file:// protocol
 DEFAULT_CSS = r"""
 :root, [data-theme="light"] {
     --bg: #ffffff; --fg: #1a1a2e; --accent: #0066cc;
@@ -120,14 +120,35 @@ DEFAULT_CSS = r"""
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-       background: var(--bg); color: var(--fg); line-height: 1.6; }
+       background: var(--bg); color: var(--fg); line-height: 1.6;
+       display: flex; flex-direction: column; min-height: 100vh; }
 header { background: var(--nav-bg); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; }
-header nav { display: flex; align-items: center; gap: 1rem; max-width: 1200px; margin: 0 auto; }
+header nav { display: flex; align-items: center; gap: 1rem; max-width: 1400px; margin: 0 auto; }
 header .logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--fg); }
 header .version { font-size: 0.85rem; color: var(--accent); }
 #theme-toggle { background: none; border: none; cursor: pointer; font-size: 1.2rem; margin-left: auto; color: var(--fg); }
+
+/* Two-column layout */
+.page-wrapper { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+/* Sticky sidebar TOC */
+.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+           overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border);
+           background: var(--toc-bg); font-size: 0.85rem; }
+.sidebar h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
+              margin: 0 0 0.75rem; border: none; color: #666; }
+.sidebar ol { padding-left: 1.2rem; }
+.sidebar li { margin: 0.15rem 0; }
+.sidebar a { text-decoration: none; color: var(--fg); }
+.sidebar a:hover { color: var(--accent); }
+
+/* Content area */
+.content { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
+
+/* Fallback for pages without sidebar (term pages) */
 main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
-footer { text-align: center; padding: 2rem; font-size: 0.85rem; color: #888; border-top: 1px solid var(--border); margin-top: 3rem; }
+
+footer { text-align: center; padding: 2rem; font-size: 0.85rem; color: #888; border-top: 1px solid var(--border); margin-top: auto; }
 a { color: var(--accent); }
 h1 { margin-bottom: 0.5rem; font-size: 1.8rem; }
 h2 { margin: 2rem 0 0.75rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; font-size: 1.4rem; }
@@ -137,14 +158,24 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .narrative { margin-bottom: 2rem; }
 .sidecar-content { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
 
-/* Metadata header */
+/* ReSpec-style metadata header */
+.respec-header { margin-bottom: 2rem; }
+.respec-header h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+.respec-header .subtitle { font-size: 1.2rem; color: #666; margin-bottom: 0.5rem; }
+.respec-header .doc-status { color: var(--accent); font-size: 1.1rem; margin-bottom: 1rem; }
+.respec-header dl { margin: 0; }
+.respec-header dt { font-weight: 700; min-width: 200px; display: block; margin-top: 0.5rem; }
+.respec-header dd { margin-left: 1rem; margin-bottom: 0.25rem; }
+.respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+/* Legacy metadata-dl (kept for backward compat) */
 .metadata-dl { margin: 1rem 0 2rem; padding: 1rem; background: var(--nav-bg); border: 1px solid var(--border); border-radius: 4px; }
 .metadata-dl dt { font-weight: 600; display: inline; margin-right: 0.5rem; }
 .metadata-dl dt::after { content: ":"; }
 .metadata-dl dd { display: inline; margin: 0 1.5rem 0 0; }
 .metadata-dl .metadata-row { margin-bottom: 0.3rem; }
 
-/* Table of Contents */
+/* Table of Contents (inline fallback) */
 .toc { background: var(--toc-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
 .toc h2 { margin: 0 0 0.5rem; border: none; font-size: 1.1rem; }
 .toc ol { padding-left: 1.5rem; }
@@ -191,6 +222,11 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .serialization-links a:hover { background: var(--accent); color: #fff; }
 
 .iri { margin-bottom: 1rem; }
+
+@media (max-width: 900px) {
+    .page-wrapper { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+}
 """
 
 

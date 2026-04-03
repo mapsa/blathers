@@ -1,32 +1,9 @@
 {% extends "base.html.j2" %}
 
-{% block content %}
-<div class="index-page">
-
-    {# ── Metadata Header ── #}
-    <h1>{{ metadata.title }}</h1>
-    <dl class="metadata-dl">
-        <div class="metadata-row"><dt>Version</dt><dd>{{ metadata.version }}</dd></div>
-        <div class="metadata-row"><dt>Namespace</dt><dd><code>{{ metadata.namespace }}</code></dd></div>
-        <div class="metadata-row"><dt>Prefix</dt><dd><code>{{ metadata.prefix }}</code></dd></div>
-        {% if metadata.license %}
-        <div class="metadata-row"><dt>License</dt><dd>{{ metadata.license }}</dd></div>
-        {% endif %}
-        {% if conneg.formats %}
-        <div class="metadata-row"><dt>Serializations</dt><dd>
-            {% for fmt in conneg.formats %}
-                {% if fmt == 'ttl' %}<a href="ontology.ttl">Turtle</a>{% endif %}
-                {% if fmt == 'jsonld' %}<a href="ontology.jsonld">JSON-LD</a>{% endif %}
-                {% if fmt == 'nt' %}<a href="ontology.nt">N-Triples</a>{% endif %}
-                {% if fmt == 'owl' %}<a href="ontology.owl">RDF/XML</a>{% endif %}
-                {% if not loop.last %} | {% endif %}
-            {% endfor %}
-        </dd></div>
-        {% endif %}
-    </dl>
-
-    {# ── Table of Contents ── #}
-    <nav class="toc" id="toc">
+{% block body_content %}
+<div class="page-wrapper">
+    {# ── Sticky Sidebar TOC ── #}
+    <nav class="sidebar" id="toc">
         <h2>Table of Contents</h2>
         <ol>
             {% if sections %}
@@ -53,6 +30,68 @@
             {% if conneg.formats %}<li><a href="#serializations">Serializations</a></li>{% endif %}
         </ol>
     </nav>
+
+    <div class="content">
+
+    {# ── ReSpec-style Metadata Header ── #}
+    <div class="respec-header">
+        <h1>{{ metadata.title }}</h1>
+        {% if metadata.description %}
+        <p class="subtitle">{{ metadata.description }}</p>
+        {% endif %}
+        {% if metadata.status %}
+        <p class="doc-status">{{ metadata.status }}</p>
+        {% endif %}
+        <dl class="metadata-dl">
+            <div class="metadata-row"><dt>This version</dt><dd><code>{{ metadata.namespace }}</code></dd></div>
+            <div class="metadata-row"><dt>Version</dt><dd>{{ metadata.version }}</dd></div>
+            <div class="metadata-row"><dt>Namespace</dt><dd><code>{{ metadata.namespace }}</code></dd></div>
+            <div class="metadata-row"><dt>Prefix</dt><dd><code>{{ metadata.prefix }}</code></dd></div>
+            {% if metadata.license %}
+            <div class="metadata-row"><dt>License</dt><dd>{{ metadata.license }}</dd></div>
+            {% endif %}
+            {% if metadata.date %}
+            <div class="metadata-row"><dt>Date</dt><dd>{{ metadata.date }}</dd></div>
+            {% endif %}
+            {% if metadata.editors %}
+            <div class="metadata-row"><dt>Editors</dt><dd>
+                {% for ed in metadata.editors %}
+                    {% if ed.url %}<a href="{{ ed.url }}">{{ ed.name }}</a>{% else %}{{ ed.name }}{% endif %}{% if ed.affiliation %} ({{ ed.affiliation }}){% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </dd></div>
+            {% endif %}
+            {% if metadata.authors %}
+            <div class="metadata-row"><dt>Authors</dt><dd>
+                {% for au in metadata.authors %}
+                    {% if au.url %}<a href="{{ au.url }}">{{ au.name }}</a>{% else %}{{ au.name }}{% endif %}{% if au.affiliation %} ({{ au.affiliation }}){% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </dd></div>
+            {% endif %}
+            {% if metadata.contributors %}
+            <div class="metadata-row"><dt>Contributors</dt><dd>{{ metadata.contributors | join(', ') }}</dd></div>
+            {% endif %}
+            {% if metadata.repository %}
+            <div class="metadata-row"><dt>Repository</dt><dd><a href="{{ metadata.repository }}">{{ metadata.repository }}</a></dd></div>
+            {% endif %}
+            {% if metadata.previous_version %}
+            <div class="metadata-row"><dt>Previous Release</dt><dd><a href="{{ metadata.previous_version }}">{{ metadata.previous_version }}</a></dd></div>
+            {% endif %}
+            {% if conneg.formats %}
+            <div class="metadata-row"><dt>Serializations</dt><dd>
+                {% for fmt in conneg.formats %}
+                    {% if fmt == 'ttl' %}<a href="ontology.ttl">Turtle</a>{% endif %}
+                    {% if fmt == 'jsonld' %}<a href="ontology.jsonld">JSON-LD</a>{% endif %}
+                    {% if fmt == 'nt' %}<a href="ontology.nt">N-Triples</a>{% endif %}
+                    {% if fmt == 'owl' %}<a href="ontology.owl">RDF/XML</a>{% endif %}
+                    {% if not loop.last %} | {% endif %}
+                {% endfor %}
+            </dd></div>
+            {% endif %}
+        </dl>
+        {% if metadata.copyright %}
+        <p class="copyright">{{ metadata.copyright }}</p>
+        {% endif %}
+    </div>
 
     {# ── Narrative Sections ── #}
     {% for section in sections %}
@@ -208,7 +247,8 @@
     </section>
     {% endif %}
 
-</div>
+    </div>{# /.content #}
+</div>{# /.page-wrapper #}
 {% endblock %}
 
 {% block scripts %}

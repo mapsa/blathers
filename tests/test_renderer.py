@@ -99,21 +99,22 @@ def test_render_index_has_hierarchy_tree(fixtures_dir: Path, tmp_path: Path):
 
 
 def test_render_index_has_metadata_header(fixtures_dir: Path, tmp_path: Path):
-    """Index page should contain a W3C-style metadata definition list."""
+    """Index page should contain a ReSpec-style metadata header."""
     manifest = _build_test_manifest(fixtures_dir)
     render_site(manifest, tmp_path)
     content = (tmp_path / "index.html").read_text()
+    assert 'class="respec-header"' in content
     assert 'class="metadata-dl"' in content
     assert "http://example.org/test#" in content
     assert "0.1.0" in content
 
 
 def test_render_index_has_toc(fixtures_dir: Path, tmp_path: Path):
-    """Index page should contain an auto-generated table of contents."""
+    """Index page should contain a sidebar table of contents."""
     manifest = _build_test_manifest(fixtures_dir)
     render_site(manifest, tmp_path)
     content = (tmp_path / "index.html").read_text()
-    assert 'class="toc"' in content
+    assert 'class="sidebar"' in content
     assert "Table of Contents" in content
     assert 'href="#classes"' in content
     assert 'href="#properties"' in content
@@ -126,6 +127,16 @@ def test_render_index_has_shapes_section(fixtures_dir: Path, tmp_path: Path):
     content = (tmp_path / "index.html").read_text()
     assert 'id="shapes"' in content
     assert 'class="shape-constraints"' in content
+
+
+def test_render_index_has_two_column_layout(fixtures_dir: Path, tmp_path: Path):
+    """Index page should use the two-column page-wrapper layout."""
+    manifest = _build_test_manifest(fixtures_dir)
+    render_site(manifest, tmp_path)
+    content = (tmp_path / "index.html").read_text()
+    assert 'class="page-wrapper"' in content
+    assert 'class="sidebar"' in content
+    assert 'class="content"' in content
 
 
 def test_manifest_has_prefixed_names(fixtures_dir: Path):

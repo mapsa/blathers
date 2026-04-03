@@ -120,6 +120,21 @@ def build_manifest(
             "license": config.metadata.license,
             "namespace": config.metadata.namespace,
             "prefix": config.metadata.prefix,
+            "description": config.metadata.description,
+            "status": config.metadata.status,
+            "date": config.metadata.date,
+            "editors": [
+                {"name": e.name, "affiliation": e.affiliation, "url": e.url}
+                for e in config.metadata.editors
+            ],
+            "authors": [
+                {"name": a.name, "affiliation": a.affiliation, "url": a.url}
+                for a in config.metadata.authors
+            ],
+            "contributors": list(config.metadata.contributors),
+            "repository": config.metadata.repository,
+            "previous_version": config.metadata.previous_version,
+            "copyright": config.metadata.copyright,
         },
         "classes": classes,
         "properties": properties,
