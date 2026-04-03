@@ -37,7 +37,7 @@
                 </ul>
             </li>{% endif %}
             {% if conneg.formats %}<li>
-                <a href="#serializations" class="toc-section-link">Serializations <span class="toc-count">{{ conneg.formats | length }}</span></a>
+                <a href="#serializations" class="toc-section-link">Serializations <span class="toc-count">{{ conneg.formats | reject('equalto', 'html') | list | length }}</span></a>
                 <ul class="toc-sub">
                 {% for fmt in conneg.formats %}
                     {% if fmt == 'ttl' %}<li><a href="ontology.ttl">Turtle</a></li>{% endif %}
