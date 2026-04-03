@@ -109,6 +109,7 @@ def _build_hierarchy(classes: list[dict], namespace: str, individuals: list[dict
             "label": cls.get("label"),
             "comment": cls.get("comment"),
             "children": children,
+            "is_individual": False,
         }
 
     tree = []
@@ -297,9 +298,29 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
                    border: 1px dashed var(--border) !important; color: var(--text-secondary) !important; }
 .tree-individual:hover { background: var(--accent) !important; color: #fff !important;
                          border-color: var(--accent) !important; font-style: italic !important; }
+
+/* Collapsible individuals group */
+.individuals-group { padding-left: 2rem; }
+.individuals-toggle { margin: 0.2rem 0; }
+.individuals-toggle summary { cursor: pointer; font-size: 0.8rem; color: var(--text-secondary);
+                               padding: 0.2rem 0.5rem; border-radius: 6px; list-style: none; }
+.individuals-toggle summary::-webkit-details-marker { display: none; }
+.individuals-toggle summary::before { content: "+"; display: inline-block; width: 1rem; font-weight: 700;
+                                       color: var(--accent); text-align: center; }
+.individuals-toggle[open] summary::before { content: "-"; }
+.individuals-toggle summary:hover { background: var(--code-bg); }
+.individuals-list { list-style: none; padding: 0; margin: 0.2rem 0 0 0; }
+.individuals-list li { padding-left: 1.5rem; position: relative; }
+.individuals-list li::before { content: ""; position: absolute; left: 0.5rem; top: 0; bottom: 0;
+                                border-left: 2px dotted var(--accent); opacity: 0.3; }
+.individuals-list li:last-child::before { bottom: calc(100% - 1.1rem); }
+.individuals-list li::after { content: ""; position: absolute; left: 0.5rem; top: 1.1rem;
+                               width: 0.75rem; border-top: 2px dotted var(--accent); opacity: 0.3; }
 .instance-chip { display: inline-block; padding: 0.15rem 0.6rem; background: var(--code-bg);
                  border-radius: 6px; font-size: 0.85em; margin: 0.1rem 0.2rem;
-                 border: 1px dashed var(--border); color: var(--text-secondary); }
+                 border: 1px dashed var(--border); color: var(--text-secondary);
+                 text-decoration: none; cursor: pointer; transition: all 0.15s; }
+.instance-chip:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* Tooltip */
 .hierarchy-tree .tree-term[title] { cursor: pointer; }

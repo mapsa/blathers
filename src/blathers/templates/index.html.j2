@@ -139,28 +139,40 @@
     {# ── Concept Hierarchy ── #}
     {% if classes %}
     {% macro render_tree(nodes) %}
+    {% set class_nodes = nodes | rejectattr('is_individual') | list %}
+    {% set individual_nodes = nodes | selectattr('is_individual') | list %}
     <ul>
-        {% for node in nodes %}
+        {% for node in class_nodes %}
         <li>
-            {% if node.is_individual %}
-            <a href="#{{ node.local_name }}" class="tree-term tree-individual"
-               data-term-id="{{ node.local_name }}"
-               data-is-individual="true"
-               data-label="{{ node.label or node.local_name }}"
-               data-iri="{{ node.iri }}"
-               {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
-               {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
-               {% if node.comment %}title="{{ node.comment }}"{% endif %}
-            >{{ node.label or node.local_name }}</a>
-            {% else %}
             <a href="#{{ node.local_name }}" class="tree-term"
                data-term-id="{{ node.local_name }}"
                {% if node.comment %}title="{{ node.comment }}"{% endif %}
             >{{ node.label or node.local_name }}</a>
-            {% endif %}
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
+        {% if individual_nodes %}
+        <li class="individuals-group">
+            <details class="individuals-toggle">
+                <summary>{{ individual_nodes | length }} instance{{ 's' if individual_nodes | length > 1 }}</summary>
+                <ul class="individuals-list">
+                {% for node in individual_nodes %}
+                    <li>
+                        <a href="#{{ node.local_name }}" class="tree-term tree-individual"
+                           data-term-id="{{ node.local_name }}"
+                           data-is-individual="true"
+                           data-label="{{ node.label or node.local_name }}"
+                           data-iri="{{ node.iri }}"
+                           {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
+                           {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
+                           {% if node.comment %}title="{{ node.comment }}"{% endif %}
+                        >{{ node.label or node.local_name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+        </li>
+        {% endif %}
     </ul>
     {% endmacro %}
     <section id="concept-hierarchy">
@@ -205,7 +217,7 @@
                 {% if cls.instances %}
                 <tr><th>Instances</th><td>
                     {% for ind in cls.instances %}
-                    <span class="instance-chip">{{ ind.label or ind.local_name }}</span>{% if not loop.last %}, {% endif %}
+                    <a href="#{{ ind.local_name }}" class="instance-chip">{{ ind.label or ind.local_name }}</a>{% if not loop.last %} {% endif %}
                     {% endfor %}
                 </td></tr>
                 {% endif %}
