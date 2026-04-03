@@ -139,15 +139,13 @@ header .version { font-size: 0.85rem; color: var(--accent); }
               margin: 0 0 0.75rem; border: none; color: #666; }
 .sidebar ol { padding-left: 1.2rem; }
 .sidebar li { margin: 0.15rem 0; }
-.sidebar a { text-decoration: none; color: var(--fg); }
-.sidebar a:hover { color: var(--accent); }
-.toc-collapsible { margin: 0; }
-.toc-collapsible summary { cursor: pointer; list-style: none; }
-.toc-collapsible summary::-webkit-details-marker { display: none; }
-.toc-collapsible summary::before { content: "▶"; font-size: 0.6em; margin-right: 0.4em; display: inline-block; transition: transform 0.15s; }
-.toc-collapsible[open] summary::before { transform: rotate(90deg); }
-.toc-collapsible summary a { font-weight: 500; }
-.toc-count { color: #999; font-size: 0.8em; font-weight: normal; }
+.sidebar a { text-decoration: none; color: var(--fg); display: block; padding: 0.35rem 0.75rem; border-radius: 4px; }
+.sidebar a:hover { color: var(--accent); background: var(--border); }
+.toc-list { list-style: none; padding: 0; margin: 0; }
+.toc-list li { margin: 0; }
+.toc-count { display: inline-block; background: var(--border); color: #666; font-size: 0.75em;
+             padding: 0.1rem 0.45rem; border-radius: 10px; margin-left: 0.4rem; font-weight: normal; }
+[data-theme="dark"] .toc-count { color: #aaa; }
 
 /* Content area */
 .content { flex: 1; padding: 2rem 2.5rem; min-width: 0; }

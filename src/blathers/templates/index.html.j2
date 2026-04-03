@@ -5,36 +5,18 @@
     {# ── Sticky Sidebar TOC ── #}
     <nav class="sidebar" id="toc">
         <h2>Table of Contents</h2>
-        <ol>
+        <ul class="toc-list">
             {% if sections %}
             {% for section in sections %}
             <li><a href="#section-{{ section.filename | replace('.md','') | replace('_','') }}">{{ section.section | capitalize }}</a></li>
             {% endfor %}
             {% endif %}
             {% if classes %}<li><a href="#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
-            {% if classes %}<li>
-                <details class="toc-collapsible">
-                    <summary><a href="#classes">Classes</a> <span class="toc-count">({{ classes | length }})</span></summary>
-                    <ol>
-                    {% for cls in classes %}
-                        <li><a href="#{{ cls.local_name }}">{{ cls.local_name }}</a></li>
-                    {% endfor %}
-                    </ol>
-                </details>
-            </li>{% endif %}
-            {% if properties %}<li>
-                <details class="toc-collapsible">
-                    <summary><a href="#properties">Properties</a> <span class="toc-count">({{ properties | length }})</span></summary>
-                    <ol>
-                    {% for prop in properties %}
-                        <li><a href="#{{ prop.local_name }}">{{ prop.local_name }}</a></li>
-                    {% endfor %}
-                    </ol>
-                </details>
-            </li>{% endif %}
+            {% if classes %}<li><a href="#classes">Classes <span class="toc-count">{{ classes | length }}</span></a></li>{% endif %}
+            {% if properties %}<li><a href="#properties">Properties <span class="toc-count">{{ properties | length }}</span></a></li>{% endif %}
             {% if shapes %}<li><a href="#shapes">SHACL Shapes</a></li>{% endif %}
             {% if conneg.formats %}<li><a href="#serializations">Serializations</a></li>{% endif %}
-        </ol>
+        </ul>
     </nav>
 
     <div class="content">
