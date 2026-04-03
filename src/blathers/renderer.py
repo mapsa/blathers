@@ -221,6 +221,7 @@ h3 { margin: 1.5rem 0 0.5rem; font-size: 1.15rem; }
 code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
 .breadcrumb { margin-bottom: 1rem; font-size: 0.9rem; }
 .narrative { margin-bottom: 2rem; }
+.narrative img, .sidecar-content img, .content img { max-width: 100%; height: auto; border-radius: 6px; }
 .narrative ul, .narrative ol, .sidecar-content ul, .sidecar-content ol,
 .detail-def ul, .detail-def ol { padding-left: 1.5rem; margin: 0.5rem 0; }
 .sidecar-content { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
