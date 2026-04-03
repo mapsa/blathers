@@ -283,15 +283,11 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
                               border: 1px solid transparent; }
 .hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-/* Individual nodes — lighter pill style with dot indicator */
-.tree-individual { font-weight: 400 !important; font-style: normal !important; background: transparent !important;
+/* Individual nodes — lighter pill style, dashed border */
+.tree-individual { font-weight: 400 !important; font-style: italic !important; background: transparent !important;
                    border: 1px dashed var(--border) !important; color: var(--text-secondary) !important; }
-.tree-individual::before { content: ""; display: inline-block; width: 6px; height: 6px;
-                           border-radius: 50%; background: var(--accent); opacity: 0.5;
-                           margin-right: 0.4rem; vertical-align: middle; }
 .tree-individual:hover { background: var(--accent) !important; color: #fff !important;
-                         border-color: var(--accent) !important; }
-.tree-individual:hover::before { background: #fff; opacity: 1; }
+                         border-color: var(--accent) !important; font-style: italic !important; }
 .instance-chip { display: inline-block; padding: 0.15rem 0.6rem; background: var(--code-bg);
                  border-radius: 6px; font-size: 0.85em; margin: 0.1rem 0.2rem;
                  border: 1px dashed var(--border); color: var(--text-secondary); }

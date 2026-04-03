@@ -381,16 +381,26 @@
                 var indComment = this.getAttribute('data-comment') || '';
                 var indTypes = this.getAttribute('data-types') || '';
 
+                /* Helper to shorten IRIs to prefixed form */
+                function shorten(iri) {
+                    var ns = '{{ metadata.namespace }}';
+                    var pfx = '{{ metadata.prefix }}';
+                    if (iri.indexOf(ns) === 0) return pfx + ':' + iri.slice(ns.length);
+                    return iri;
+                }
+
                 var html = '<h3>' + indLabel + '</h3>';
-                if (indIri) html += '<div class="detail-iri"><code>' + indIri + '</code></div>';
-                html += '<div class="detail-row"><dt>Type</dt><dd><code>owl:NamedIndividual</code></dd></div>';
+                html += '<div class="detail-row"><dt>Type</dt><dd>Named Individual</dd></div>';
+                if (indIri) html += '<div class="detail-iri"><code>' + shorten(indIri) + '</code></div>';
                 if (indComment) html += '<div class="detail-def">' + indComment + '</div>';
                 if (indTypes) {
                     var typeList = indTypes.split(',');
                     html += '<div class="detail-row"><dt>Instance of</dt><dd>';
                     for (var t = 0; t < typeList.length; t++) {
                         if (t > 0) html += ', ';
-                        html += '<code>' + typeList[t] + '</code>';
+                        var shortType = shorten(typeList[t]);
+                        var typeId = typeList[t].split('#').pop().split('/').pop();
+                        html += '<a href="#' + typeId + '">' + shortType + '</a>';
                     }
                     html += '</dd></div>';
                 }
