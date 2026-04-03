@@ -4,7 +4,7 @@
 <div class="page-wrapper">
     {# ── Sticky Sidebar TOC ── #}
     <nav class="sidebar" id="toc">
-        <h2>Table of Contents</h2>
+        <a href="#top" class="toc-title">Table of Contents</a>
         <ul class="toc-list">
             {% if sections %}
             {% for section in sections %}
@@ -12,14 +12,28 @@
             {% endfor %}
             {% endif %}
             {% if classes %}<li><a href="#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
-            {% if classes %}<li><a href="#classes">Classes <span class="toc-count">{{ classes | length }}</span></a></li>{% endif %}
-            {% if properties %}<li><a href="#properties">Properties <span class="toc-count">{{ properties | length }}</span></a></li>{% endif %}
+            {% if classes %}<li>
+                <a href="#classes" class="toc-section-link">Classes <span class="toc-count">{{ classes | length }}</span></a>
+                <ul class="toc-sub">
+                {% for cls in classes %}
+                    <li><a href="#{{ cls.local_name }}">{{ cls.local_name }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>{% endif %}
+            {% if properties %}<li>
+                <a href="#properties" class="toc-section-link">Properties <span class="toc-count">{{ properties | length }}</span></a>
+                <ul class="toc-sub">
+                {% for prop in properties %}
+                    <li><a href="#{{ prop.local_name }}">{{ prop.local_name }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>{% endif %}
             {% if shapes %}<li><a href="#shapes">SHACL Shapes</a></li>{% endif %}
             {% if conneg.formats %}<li><a href="#serializations">Serializations</a></li>{% endif %}
         </ul>
     </nav>
 
-    <div class="content">
+    <div class="content" id="top">
 
     {# ── ReSpec-style Metadata Header ── #}
     <div class="respec-header">
