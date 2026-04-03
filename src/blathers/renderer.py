@@ -122,7 +122,8 @@ DEFAULT_CSS = r"""
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
        background: var(--bg); color: var(--fg); line-height: 1.6;
        display: flex; flex-direction: column; min-height: 100vh; }
-header { background: var(--nav-bg); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; }
+header { background: var(--nav-bg); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem;
+         position: sticky; top: 0; z-index: 50; }
 header nav { display: flex; align-items: center; gap: 1rem; max-width: 1400px; margin: 0 auto; }
 header .logo { font-weight: 700; font-size: 1.1rem; text-decoration: none; color: var(--fg); }
 header .version { font-size: 0.85rem; color: var(--accent); }
@@ -132,8 +133,8 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .page-wrapper { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
 
 /* Sticky sidebar TOC */
-.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 0; align-self: flex-start;
-           max-height: 100vh; overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border);
+.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 3rem; align-self: flex-start;
+           max-height: calc(100vh - 3rem); overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border);
            background: var(--toc-bg); font-size: 0.85rem; }
 .sidebar h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
               margin: 0 0 0.75rem; border: none; color: #666; }
