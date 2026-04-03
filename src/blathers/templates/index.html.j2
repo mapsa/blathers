@@ -28,8 +28,8 @@
                 {% endfor %}
                 </ul>
             </li>{% endif %}
-            {% if shapes %}<li><a href="#shapes">SHACL Shapes</a></li>{% endif %}
-            {% if conneg.formats %}<li><a href="#serializations">Serializations</a></li>{% endif %}
+            {% if shapes %}<li><a href="#shapes">SHACL Shapes <span class="toc-count">{{ shapes | length }}</span></a></li>{% endif %}
+            {% if conneg.formats %}<li><a href="#serializations">Serializations <span class="toc-count">{{ conneg.formats | length }}</span></a></li>{% endif %}
         </ul>
     </nav>
 
