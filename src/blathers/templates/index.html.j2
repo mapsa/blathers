@@ -5,6 +5,7 @@
     {# ── Sticky Sidebar TOC ── #}
     <nav class="sidebar" id="toc">
         <a href="#top" class="toc-title">Table of Contents</a>
+        <input type="text" id="toc-search" class="sidebar-search" placeholder="Search terms...">
         <ul class="toc-list">
             {% if sections %}
             {% for section in sections %}
@@ -150,13 +151,13 @@
                 {% if node.children %}
                 <details open>
                     <summary>
-                        <a href="#{{ node.local_name }}" class="tree-label">{{ node.prefixed_name }}</a>
+                        <a href="#{{ node.local_name }}" class="tree-label">{{ node.local_name }}</a>
                         {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
                     </summary>
                     {{ render_tree(node.children) }}
                 </details>
                 {% else %}
-                <a href="#{{ node.local_name }}" class="tree-label">{{ node.prefixed_name }}</a>
+                <a href="#{{ node.local_name }}" class="tree-label">{{ node.local_name }}</a>
                 {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
                 {% endif %}
             </li>
@@ -289,6 +290,7 @@
 {% block scripts %}
 <script>
 (function(){
+    /* --- Expand/Collapse All --- */
     var expandBtn = document.getElementById('expand-all');
     var collapseBtn = document.getElementById('collapse-all');
     if (expandBtn) {
@@ -303,7 +305,8 @@
             for (var i = 0; i < details.length; i++) details[i].open = false;
         });
     }
-    /* TOC: click section link to toggle sub-list */
+
+    /* --- TOC section toggle --- */
     var sectionLinks = document.querySelectorAll('.toc-section-link');
     for (var i = 0; i < sectionLinks.length; i++) {
         sectionLinks[i].addEventListener('click', function(e){
@@ -312,6 +315,119 @@
                 e.preventDefault();
                 sub.classList.toggle('open');
             }
+        });
+    }
+
+    /* --- Search --- */
+    var searchInput = document.getElementById('toc-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(){
+            var q = this.value.toLowerCase().trim();
+            var items = document.querySelectorAll('.toc-sub li');
+            for (var i = 0; i < items.length; i++) {
+                var text = items[i].textContent.toLowerCase();
+                items[i].classList.toggle('search-hidden', q && text.indexOf(q) === -1);
+            }
+            /* Auto-expand sections with matches */
+            var subs = document.querySelectorAll('.toc-sub');
+            for (var i = 0; i < subs.length; i++) {
+                var hasVisible = subs[i].querySelector('li:not(.search-hidden)');
+                if (q && hasVisible) subs[i].classList.add('open');
+                else if (!q) subs[i].classList.remove('open');
+            }
+        });
+    }
+
+    /* --- Scroll Spy --- */
+    var tocLinks = document.querySelectorAll('.toc-list a[href^="#"]');
+    var sections = [];
+    for (var i = 0; i < tocLinks.length; i++) {
+        var id = tocLinks[i].getAttribute('href').slice(1);
+        var el = document.getElementById(id);
+        if (el) sections.push({link: tocLinks[i], el: el});
+    }
+    function updateSpy() {
+        var scrollY = window.scrollY + 80;
+        var active = null;
+        for (var i = 0; i < sections.length; i++) {
+            if (sections[i].el.offsetTop <= scrollY) active = sections[i].link;
+        }
+        for (var i = 0; i < tocLinks.length; i++) tocLinks[i].classList.remove('active');
+        if (active) active.classList.add('active');
+    }
+    window.addEventListener('scroll', updateSpy);
+    updateSpy();
+
+    /* --- Highlight on arrival --- */
+    function highlightTerm(id) {
+        var el = document.getElementById(id);
+        if (el && el.classList.contains('term-def')) {
+            el.classList.remove('highlight');
+            void el.offsetWidth; /* force reflow */
+            el.classList.add('highlight');
+        }
+    }
+    window.addEventListener('hashchange', function(){
+        highlightTerm(location.hash.slice(1));
+    });
+    document.addEventListener('click', function(e){
+        var link = e.target.closest('a[href^="#"]');
+        if (link && !link.classList.contains('tree-label')) {
+            var id = link.getAttribute('href').slice(1);
+            setTimeout(function(){ highlightTerm(id); }, 300);
+        }
+    });
+
+    /* --- Preview Cards --- */
+    var activeCard = null;
+    var hierarchyLinks = document.querySelectorAll('#concept-hierarchy .tree-label');
+    for (var i = 0; i < hierarchyLinks.length; i++) {
+        hierarchyLinks[i].addEventListener('click', function(e){
+            e.preventDefault();
+            var termId = this.getAttribute('href').slice(1);
+            var termDef = document.getElementById(termId);
+
+            /* Close existing card */
+            if (activeCard) { activeCard.remove(); activeCard = null; }
+
+            /* If clicking the same term, just close */
+            if (this._cardOpen) { this._cardOpen = false; return; }
+
+            /* Reset all flags */
+            for (var j = 0; j < hierarchyLinks.length; j++) hierarchyLinks[j]._cardOpen = false;
+            this._cardOpen = true;
+
+            /* Build card from the term definition table */
+            var card = document.createElement('div');
+            card.className = 'preview-card';
+
+            var label = termDef ? termDef.querySelector('h3') : null;
+            var labelText = label ? label.childNodes[0].textContent.trim() : termId;
+
+            /* Get IRI and definition from table */
+            var rows = termDef ? termDef.querySelectorAll('.term-contents tr') : [];
+            var iri = '', def = '', parents = '', children = '';
+            for (var r = 0; r < rows.length; r++) {
+                var th = rows[r].querySelector('th');
+                var td = rows[r].querySelector('td');
+                if (!th || !td) continue;
+                var key = th.textContent.trim();
+                if (key === 'IRI') iri = td.textContent.trim();
+                if (key === 'Definition') def = td.textContent.trim();
+                if (key === 'Broader/Parent types') parents = td.textContent.trim();
+                if (key === 'Narrower/Child types') children = td.textContent.trim();
+            }
+
+            var html = '<div class="pc-label">' + labelText + '</div>';
+            if (iri) html += '<div class="pc-iri">' + iri + '</div>';
+            if (def) html += '<div class="pc-def">' + (def.length > 200 ? def.slice(0,200) + '...' : def) + '</div>';
+            if (parents) html += '<div class="pc-meta">Parent: ' + parents + '</div>';
+            if (children) html += '<div class="pc-meta">Children: ' + children + '</div>';
+            html += '<a href="#' + termId + '" class="pc-link" onclick="this.parentNode.remove()">Go to definition &darr;</a>';
+
+            card.innerHTML = html;
+            this.parentNode.insertBefore(card, this.nextSibling);
+            activeCard = card;
         });
     }
 })();

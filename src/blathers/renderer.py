@@ -246,6 +246,38 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .back-to-top.visible { opacity: 1; }
 .back-to-top:hover { background: var(--fg); color: var(--bg); }
 
+/* Search */
+.sidebar-search { width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 4px;
+                   background: var(--bg); color: var(--fg); font-size: 0.85rem; margin-bottom: 0.75rem;
+                   outline: none; }
+.sidebar-search:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,102,204,0.15); }
+.sidebar-search::placeholder { color: #999; }
+.toc-sub li.search-hidden { display: none; }
+
+/* Scroll spy active */
+.toc-list a.active { color: var(--accent); font-weight: 600; border-left: 3px solid var(--accent); padding-left: calc(0.75rem - 3px); }
+
+/* Smooth scroll + offset */
+html { scroll-behavior: smooth; }
+.term-def, section[id] { scroll-margin-top: 4rem; }
+
+/* Highlight animation */
+@keyframes term-flash { from { background: rgba(0,102,204,0.12); } to { background: transparent; } }
+.term-def.highlight { animation: term-flash 1.5s ease-out; }
+
+/* Preview card */
+.preview-card { background: var(--nav-bg); border: 1px solid var(--border); border-radius: 6px;
+                padding: 0.75rem 1rem; margin: 0.4rem 0 0.4rem 1rem; font-size: 0.9rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-width: 600px; }
+[data-theme="dark"] .preview-card { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.preview-card .pc-label { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
+.preview-card .pc-iri { font-size: 0.8rem; color: #666; margin-bottom: 0.4rem; }
+[data-theme="dark"] .preview-card .pc-iri { color: #aaa; }
+.preview-card .pc-def { margin-bottom: 0.4rem; }
+.preview-card .pc-meta { font-size: 0.85rem; color: #666; margin-bottom: 0.4rem; }
+[data-theme="dark"] .preview-card .pc-meta { color: #aaa; }
+.preview-card .pc-link { font-weight: 500; }
+
 @media (max-width: 900px) {
     .page-wrapper { flex-direction: column; }
     .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
