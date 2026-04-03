@@ -145,7 +145,7 @@
             <a href="#{{ node.local_name }}" class="tree-term"
                data-term-id="{{ node.local_name }}"
                {% if node.comment %}title="{{ node.comment }}"{% endif %}
-            >{{ node.local_name }}</a>
+            >{{ node.label or node.local_name }}</a>
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
