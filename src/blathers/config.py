@@ -19,6 +19,7 @@ class PersonConfig(BaseModel):
     name: str
     affiliation: Optional[str] = None
     url: Optional[str] = None
+    orcid: Optional[str] = None
 
 
 class MetadataConfig(BaseModel):

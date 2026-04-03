@@ -187,6 +187,8 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
 [data-theme="dark"] .respec-header .copyright { color: #aaa; }
 .respec-header .contributors { font-size: 0.9rem; margin-top: 0.5rem; }
+.orcid-link { text-decoration: none; }
+.orcid-icon { width: 16px; height: 16px; vertical-align: text-bottom; display: inline-block; }
 
 /* Table of Contents (inline fallback) */
 .toc { background: var(--toc-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
