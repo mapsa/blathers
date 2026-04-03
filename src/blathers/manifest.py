@@ -124,11 +124,11 @@ def build_manifest(
             "status": config.metadata.status,
             "date": config.metadata.date,
             "editors": [
-                {"name": e.name, "affiliation": e.affiliation, "url": e.url}
+                {"name": e.name, "affiliation": e.affiliation, "url": e.url, "orcid": e.orcid}
                 for e in config.metadata.editors
             ],
             "authors": [
-                {"name": a.name, "affiliation": a.affiliation, "url": a.url}
+                {"name": a.name, "affiliation": a.affiliation, "url": a.url, "orcid": a.orcid}
                 for a in config.metadata.authors
             ],
             "contributors": list(config.metadata.contributors),
