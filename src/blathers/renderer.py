@@ -263,16 +263,16 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 /* Hierarchy tree — file-tree style */
 .hierarchy-tree { list-style: none; padding: 0; margin: 0; font-size: 0.95rem; }
 .hierarchy-tree ul { list-style: none; padding: 0; margin: 0; }
-.hierarchy-tree li { position: relative; padding-left: 2rem; min-height: 2rem; display: flex; flex-wrap: wrap; align-items: center; }
+.hierarchy-tree li { position: relative; padding-left: 2rem; }
 .hierarchy-tree > ul > li { padding-left: 0; } /* root items no indent */
 
 /* Vertical connector lines */
 .hierarchy-tree li li::before { content: ""; position: absolute; left: 0.6rem; top: 0; bottom: 0;
                                  border-left: 2px solid var(--accent); opacity: 0.25; }
-.hierarchy-tree li li:last-child::before { bottom: 50%; }
+.hierarchy-tree li li:last-child::before { bottom: calc(100% - 1.1rem); }
 
 /* Horizontal branch lines */
-.hierarchy-tree li li::after { content: ""; position: absolute; left: 0.6rem; top: 50%;
+.hierarchy-tree li li::after { content: ""; position: absolute; left: 0.6rem; top: 1.1rem;
                                 width: 1rem; border-top: 2px solid var(--accent); opacity: 0.25; }
 
 /* Class chips — bold, prominent */
