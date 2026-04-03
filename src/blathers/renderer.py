@@ -212,16 +212,30 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .term-table th, .term-table td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .term-table th { font-weight: 600; background: var(--nav-bg); }
 
-/* Concept hierarchy tree */
-.concept-list { list-style: none; padding-left: 0; }
-.concept-list ul { list-style: none; padding-left: 1.5rem; }
-.concept-list li { margin: 0.15rem 0; }
-.concept-list .tree-label { font-weight: 500; }
-.concept-list .tree-desc { color: #666; font-size: 0.9em; margin-left: 0.5rem; }
-[data-theme="dark"] .concept-list .tree-desc { color: #aaa; }
-.btn-hierarchy { background: var(--accent); color: #fff; border: none; cursor: pointer;
-                 padding: 0.3rem 0.8rem; border-radius: 3px; font-size: 0.85rem; margin: 0.5rem 0.25rem 0.75rem 0; }
-.btn-hierarchy:hover { opacity: 0.9; }
+/* Hierarchy tree — file-tree style */
+.hierarchy-tree { list-style: none; padding: 0; margin: 0; font-size: 0.95rem; }
+.hierarchy-tree ul { list-style: none; padding: 0; margin: 0; }
+.hierarchy-tree li { position: relative; padding-left: 1.5rem; }
+.hierarchy-tree > ul > li { padding-left: 0; } /* root items no indent */
+
+/* Vertical connector lines */
+.hierarchy-tree li li::before { content: ""; position: absolute; left: 0.5rem; top: 0; bottom: 0;
+                                 border-left: 1px solid var(--border); }
+.hierarchy-tree li li:last-child::before { bottom: 50%; }
+
+/* Horizontal branch lines */
+.hierarchy-tree li li::after { content: ""; position: absolute; left: 0.5rem; top: 50%;
+                                width: 0.75rem; border-top: 1px solid var(--border); }
+
+/* Term chips */
+.hierarchy-tree .tree-term { display: inline-block; padding: 0.15rem 0.6rem; margin: 0.15rem 0;
+                              border-radius: 4px; text-decoration: none; color: var(--fg);
+                              font-weight: 500; font-size: 0.9rem; transition: all 0.15s;
+                              position: relative; z-index: 1; }
+.hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; }
+
+/* Tooltip */
+.hierarchy-tree .tree-term[title] { cursor: pointer; }
 
 /* SHACL shapes */
 .shape-block { margin-bottom: 1.5rem; }
@@ -264,19 +278,6 @@ html { scroll-behavior: smooth; }
 /* Highlight animation */
 @keyframes term-flash { from { background: rgba(0,102,204,0.12); } to { background: transparent; } }
 .term-def.highlight { animation: term-flash 1.5s ease-out; }
-
-/* Preview card */
-.preview-card { background: var(--nav-bg); border: 1px solid var(--border); border-radius: 6px;
-                padding: 0.75rem 1rem; margin: 0.4rem 0 0.4rem 1rem; font-size: 0.9rem;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-width: 600px; }
-[data-theme="dark"] .preview-card { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-.preview-card .pc-label { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
-.preview-card .pc-iri { font-size: 0.8rem; color: #666; margin-bottom: 0.4rem; }
-[data-theme="dark"] .preview-card .pc-iri { color: #aaa; }
-.preview-card .pc-def { margin-bottom: 0.4rem; }
-.preview-card .pc-meta { font-size: 0.85rem; color: #666; margin-bottom: 0.4rem; }
-[data-theme="dark"] .preview-card .pc-meta { color: #aaa; }
-.preview-card .pc-link { font-weight: 500; }
 
 @media (max-width: 900px) {
     .page-wrapper { flex-direction: column; }

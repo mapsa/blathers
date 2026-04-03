@@ -138,33 +138,21 @@
 
     {# ── Concept Hierarchy ── #}
     {% if classes %}
+    {% macro render_tree(nodes) %}
+    <ul>
+        {% for node in nodes %}
+        <li>
+            <a href="#{{ node.local_name }}" class="tree-term"{% if node.comment %} title="{{ node.comment }}"{% endif %}>{{ node.local_name }}</a>
+            {% if node.children %}{{ render_tree(node.children) }}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endmacro %}
     <section id="concept-hierarchy">
         <h2>Concept Hierarchy</h2>
-        <div>
-            <button class="btn-hierarchy" id="expand-all" type="button">Expand All</button>
-            <button class="btn-hierarchy" id="collapse-all" type="button">Collapse All</button>
+        <div class="hierarchy-tree">
+            {{ render_tree(hierarchy) }}
         </div>
-        {% macro render_tree(nodes) %}
-        <ul class="concept-list">
-            {% for node in nodes %}
-            <li>
-                {% if node.children %}
-                <details open>
-                    <summary>
-                        <a href="#{{ node.local_name }}" class="tree-label">{{ node.local_name }}</a>
-                        {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
-                    </summary>
-                    {{ render_tree(node.children) }}
-                </details>
-                {% else %}
-                <a href="#{{ node.local_name }}" class="tree-label">{{ node.local_name }}</a>
-                {% if node.comment %}<span class="tree-desc">: {{ node.comment }}</span>{% endif %}
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-        {% endmacro %}
-        {{ render_tree(hierarchy) }}
     </section>
     {% endif %}
 
@@ -290,22 +278,6 @@
 {% block scripts %}
 <script>
 (function(){
-    /* --- Expand/Collapse All --- */
-    var expandBtn = document.getElementById('expand-all');
-    var collapseBtn = document.getElementById('collapse-all');
-    if (expandBtn) {
-        expandBtn.addEventListener('click', function(){
-            var details = document.querySelectorAll('#concept-hierarchy details');
-            for (var i = 0; i < details.length; i++) details[i].open = true;
-        });
-    }
-    if (collapseBtn) {
-        collapseBtn.addEventListener('click', function(){
-            var details = document.querySelectorAll('#concept-hierarchy details');
-            for (var i = 0; i < details.length; i++) details[i].open = false;
-        });
-    }
-
     /* --- TOC section toggle --- */
     var sectionLinks = document.querySelectorAll('.toc-section-link');
     for (var i = 0; i < sectionLinks.length; i++) {
@@ -372,64 +344,11 @@
     });
     document.addEventListener('click', function(e){
         var link = e.target.closest('a[href^="#"]');
-        if (link && !link.classList.contains('tree-label')) {
+        if (link) {
             var id = link.getAttribute('href').slice(1);
             setTimeout(function(){ highlightTerm(id); }, 300);
         }
     });
-
-    /* --- Preview Cards --- */
-    var activeCard = null;
-    var hierarchyLinks = document.querySelectorAll('#concept-hierarchy .tree-label');
-    for (var i = 0; i < hierarchyLinks.length; i++) {
-        hierarchyLinks[i].addEventListener('click', function(e){
-            e.preventDefault();
-            var termId = this.getAttribute('href').slice(1);
-            var termDef = document.getElementById(termId);
-
-            /* Close existing card */
-            if (activeCard) { activeCard.remove(); activeCard = null; }
-
-            /* If clicking the same term, just close */
-            if (this._cardOpen) { this._cardOpen = false; return; }
-
-            /* Reset all flags */
-            for (var j = 0; j < hierarchyLinks.length; j++) hierarchyLinks[j]._cardOpen = false;
-            this._cardOpen = true;
-
-            /* Build card from the term definition table */
-            var card = document.createElement('div');
-            card.className = 'preview-card';
-
-            var label = termDef ? termDef.querySelector('h3') : null;
-            var labelText = label ? label.childNodes[0].textContent.trim() : termId;
-
-            /* Get IRI and definition from table */
-            var rows = termDef ? termDef.querySelectorAll('.term-contents tr') : [];
-            var iri = '', def = '', parents = '', children = '';
-            for (var r = 0; r < rows.length; r++) {
-                var th = rows[r].querySelector('th');
-                var td = rows[r].querySelector('td');
-                if (!th || !td) continue;
-                var key = th.textContent.trim();
-                if (key === 'IRI') iri = td.textContent.trim();
-                if (key === 'Definition') def = td.textContent.trim();
-                if (key === 'Broader/Parent types') parents = td.textContent.trim();
-                if (key === 'Narrower/Child types') children = td.textContent.trim();
-            }
-
-            var html = '<div class="pc-label">' + labelText + '</div>';
-            if (iri) html += '<div class="pc-iri">' + iri + '</div>';
-            if (def) html += '<div class="pc-def">' + (def.length > 200 ? def.slice(0,200) + '...' : def) + '</div>';
-            if (parents) html += '<div class="pc-meta">Parent: ' + parents + '</div>';
-            if (children) html += '<div class="pc-meta">Children: ' + children + '</div>';
-            html += '<a href="#' + termId + '" class="pc-link" onclick="this.parentNode.remove()">Go to definition &darr;</a>';
-
-            card.innerHTML = html;
-            this.parentNode.insertBefore(card, this.nextSibling);
-            activeCard = card;
-        });
-    }
 })();
 </script>
 {% endblock %}

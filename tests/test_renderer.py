@@ -88,14 +88,13 @@ def test_render_index_has_term_definition_tables(fixtures_dir: Path, tmp_path: P
 
 
 def test_render_index_has_hierarchy_tree(fixtures_dir: Path, tmp_path: Path):
-    """Index page should contain a collapsible concept hierarchy."""
+    """Index page should contain a file-tree style concept hierarchy."""
     manifest = _build_test_manifest(fixtures_dir)
     render_site(manifest, tmp_path)
     content = (tmp_path / "index.html").read_text()
     assert 'id="concept-hierarchy"' in content
-    assert 'class="concept-list"' in content
-    assert "expand-all" in content
-    assert "collapse-all" in content
+    assert 'class="hierarchy-tree"' in content
+    assert 'class="tree-term"' in content
 
 
 def test_render_index_has_metadata_header(fixtures_dir: Path, tmp_path: Path):
