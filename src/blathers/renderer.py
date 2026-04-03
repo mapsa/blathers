@@ -144,7 +144,7 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .toc-collapsible { margin: 0; }
 .toc-collapsible summary { cursor: pointer; list-style: none; }
 .toc-collapsible summary::-webkit-details-marker { display: none; }
-.toc-collapsible summary::before { content: "\\25B6"; font-size: 0.6em; margin-right: 0.4em; display: inline-block; transition: transform 0.15s; }
+.toc-collapsible summary::before { content: "▶"; font-size: 0.6em; margin-right: 0.4em; display: inline-block; transition: transform 0.15s; }
 .toc-collapsible[open] summary::before { transform: rotate(90deg); }
 .toc-collapsible summary a { font-weight: 500; }
 .toc-count { color: #999; font-size: 0.8em; font-weight: normal; }
@@ -225,6 +225,14 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .serialization-links a:hover { background: var(--accent); color: #fff; }
 
 .iri { margin-bottom: 1rem; }
+
+/* Back to top button */
+.back-to-top { position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: #fff;
+               width: 2.5rem; height: 2.5rem; border-radius: 50%; text-align: center; line-height: 2.5rem;
+               text-decoration: none; font-size: 1.2rem; opacity: 0; transition: opacity 0.3s;
+               z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.back-to-top.visible { opacity: 1; }
+.back-to-top:hover { background: var(--fg); color: var(--bg); }
 
 @media (max-width: 900px) {
     .page-wrapper { flex-direction: column; }
