@@ -132,8 +132,8 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .page-wrapper { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
 
 /* Sticky sidebar TOC */
-.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 0; height: 100vh;
-           overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border);
+.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 0; align-self: flex-start;
+           max-height: 100vh; overflow-y: auto; padding: 1.5rem 1rem; border-right: 1px solid var(--border);
            background: var(--toc-bg); font-size: 0.85rem; }
 .sidebar h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;
               margin: 0 0 0.75rem; border: none; color: #666; }
@@ -159,7 +159,7 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .toc-sub a:hover { color: var(--accent); }
 
 /* Content area */
-.content { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
+.content { flex: 1; padding: 2rem 2.5rem; min-width: 0; padding-bottom: 60vh; }
 
 /* Fallback for pages without sidebar (term pages) */
 main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
