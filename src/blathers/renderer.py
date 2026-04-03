@@ -233,7 +233,7 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .respec-header .doc-status { color: var(--accent); font-size: 1rem; margin-bottom: 1rem; }
 .respec-header dl { margin: 0 0 0.75rem; display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 1rem; align-items: baseline; }
 .respec-header dt { font-weight: 700; white-space: nowrap; }
-.respec-header dd { margin: 0; }
+.respec-header dd { margin: 0; grid-column: 2; }
 .respec-header .copyright { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
 .respec-header .contributors { font-size: 0.9rem; margin-top: 0.5rem; }
 .orcid-link { text-decoration: none; }
