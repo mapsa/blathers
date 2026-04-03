@@ -24,6 +24,9 @@
             </label>
         </nav>
     </header>
+    {% if metadata.status %}
+    <div class="status-banner status-{{ metadata.status | lower | replace(' ', '-') }}">{{ metadata.status }}</div>
+    {% endif %}
     {% block body_content %}
     <main>
         {% block content %}{% endblock %}

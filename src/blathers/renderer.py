@@ -171,6 +171,21 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .theme-icon.sun { left: 5px; color: #f6ad55; }
 .theme-icon.moon { right: 5px; color: #e2e8f0; }
 
+/* Status banner */
+.status-banner { text-align: center; padding: 0.3rem 1rem; font-size: 0.8rem; font-weight: 600;
+                 letter-spacing: 0.05em; text-transform: uppercase; }
+.status-draft, .status-draft-specification { background: #fef3c7; color: #92400e; }
+.status-working-draft { background: #fef3c7; color: #92400e; }
+.status-candidate, .status-candidate-recommendation { background: #dbeafe; color: #1e40af; }
+.status-final, .status-final-specification, .status-recommendation { background: #d1fae5; color: #065f46; }
+.status-deprecated, .status-retired { background: #fee2e2; color: #991b1b; }
+[data-theme="dark"] .status-draft, [data-theme="dark"] .status-draft-specification,
+[data-theme="dark"] .status-working-draft { background: #78350f; color: #fef3c7; }
+[data-theme="dark"] .status-candidate, [data-theme="dark"] .status-candidate-recommendation { background: #1e3a5f; color: #bfdbfe; }
+[data-theme="dark"] .status-final, [data-theme="dark"] .status-final-specification,
+[data-theme="dark"] .status-recommendation { background: #064e3b; color: #a7f3d0; }
+[data-theme="dark"] .status-deprecated, [data-theme="dark"] .status-retired { background: #7f1d1d; color: #fecaca; }
+
 /* Two-column layout */
 .page-wrapper { display: flex; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
 
