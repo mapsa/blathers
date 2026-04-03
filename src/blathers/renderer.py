@@ -212,6 +212,27 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .term-table th, .term-table td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .term-table th { font-weight: 600; background: var(--nav-bg); }
 
+/* Hierarchy two-panel layout */
+.hierarchy-section { display: flex; gap: 1.5rem; min-height: 300px; }
+.hierarchy-left { flex: 0 0 40%; overflow-y: auto; max-height: 70vh;
+                  border: 1px solid var(--border); border-radius: 6px; padding: 1rem; }
+.hierarchy-right { flex: 1; position: sticky; top: 5rem; align-self: flex-start;
+                   border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem;
+                   background: var(--nav-bg); max-height: 70vh; overflow-y: auto; }
+.hierarchy-right .detail-empty { color: #999; font-style: italic; }
+.hierarchy-right h3 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+.hierarchy-right .detail-iri { font-size: 0.85rem; color: #666; margin-bottom: 0.75rem; word-break: break-all; }
+[data-theme="dark"] .hierarchy-right .detail-iri { color: #aaa; }
+.hierarchy-right .detail-row { margin-bottom: 0.5rem; }
+.hierarchy-right .detail-row dt { font-weight: 600; font-size: 0.85rem; color: #666; margin-bottom: 0.1rem; }
+[data-theme="dark"] .hierarchy-right .detail-row dt { color: #aaa; }
+.hierarchy-right .detail-row dd { margin: 0; }
+.hierarchy-right .detail-def { margin-bottom: 0.75rem; line-height: 1.5; }
+.hierarchy-right .detail-link { display: inline-block; margin-top: 0.5rem; font-weight: 500; }
+
+/* Selected term in tree */
+.hierarchy-tree .tree-term.selected { background: var(--accent); color: #fff; }
+
 /* Hierarchy tree — file-tree style */
 .hierarchy-tree { list-style: none; padding: 0; margin: 0; font-size: 0.95rem; }
 .hierarchy-tree ul { list-style: none; padding: 0; margin: 0; }
@@ -282,6 +303,9 @@ html { scroll-behavior: smooth; }
 @media (max-width: 900px) {
     .page-wrapper { flex-direction: column; }
     .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+    .hierarchy-section { flex-direction: column; }
+    .hierarchy-left { max-height: 50vh; }
+    .hierarchy-right { position: static; }
 }
 """
 

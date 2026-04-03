@@ -142,7 +142,10 @@
     <ul>
         {% for node in nodes %}
         <li>
-            <a href="#{{ node.local_name }}" class="tree-term"{% if node.comment %} title="{{ node.comment }}"{% endif %}>{{ node.local_name }}</a>
+            <a href="#{{ node.local_name }}" class="tree-term"
+               data-term-id="{{ node.local_name }}"
+               {% if node.comment %}title="{{ node.comment }}"{% endif %}
+            >{{ node.local_name }}</a>
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
@@ -150,8 +153,15 @@
     {% endmacro %}
     <section id="concept-hierarchy">
         <h2>Concept Hierarchy</h2>
-        <div class="hierarchy-tree">
-            {{ render_tree(hierarchy) }}
+        <div class="hierarchy-section">
+            <div class="hierarchy-left">
+                <div class="hierarchy-tree">
+                    {{ render_tree(hierarchy) }}
+                </div>
+            </div>
+            <div class="hierarchy-right" id="hierarchy-detail">
+                <p class="detail-empty">Click a term to see details</p>
+            </div>
         </div>
     </section>
     {% endif %}
@@ -329,6 +339,47 @@
     }
     window.addEventListener('scroll', updateSpy);
     updateSpy();
+
+    /* --- Hierarchy Detail Panel --- */
+    var detailPanel = document.getElementById('hierarchy-detail');
+    var treeTerms = document.querySelectorAll('.hierarchy-tree .tree-term');
+    for (var i = 0; i < treeTerms.length; i++) {
+        treeTerms[i].addEventListener('click', function(e){
+            e.preventDefault();
+            var termId = this.getAttribute('data-term-id');
+            var termDef = document.getElementById(termId);
+
+            /* Update selected state */
+            for (var j = 0; j < treeTerms.length; j++) treeTerms[j].classList.remove('selected');
+            this.classList.add('selected');
+
+            if (!termDef || !detailPanel) return;
+
+            /* Extract data from term definition table */
+            var label = termDef.querySelector('h3');
+            var labelText = label ? label.childNodes[0].textContent.trim() : termId;
+            var rows = termDef.querySelectorAll('.term-contents tr');
+            var info = {};
+            for (var r = 0; r < rows.length; r++) {
+                var th = rows[r].querySelector('th');
+                var td = rows[r].querySelector('td');
+                if (th && td) info[th.textContent.trim()] = td.innerHTML;
+            }
+
+            /* Build detail panel HTML */
+            var html = '<h3>' + labelText + '</h3>';
+            if (info['IRI']) html += '<div class="detail-iri">' + info['IRI'] + '</div>';
+            if (info['Type']) html += '<div class="detail-row"><dt>Type</dt><dd>' + info['Type'] + '</dd></div>';
+            if (info['Definition']) html += '<div class="detail-def">' + info['Definition'] + '</div>';
+            if (info['Broader/Parent types']) html += '<div class="detail-row"><dt>Parent types</dt><dd>' + info['Broader/Parent types'] + '</dd></div>';
+            if (info['Narrower/Child types']) html += '<div class="detail-row"><dt>Child types</dt><dd>' + info['Narrower/Child types'] + '</dd></div>';
+            if (info['Subject of']) html += '<div class="detail-row"><dt>Subject of</dt><dd>' + info['Subject of'] + '</dd></div>';
+            if (info['Object of']) html += '<div class="detail-row"><dt>Object of</dt><dd>' + info['Object of'] + '</dd></div>';
+            html += '<a href="#' + termId + '" class="detail-link">Go to full definition &darr;</a>';
+
+            detailPanel.innerHTML = html;
+        });
+    }
 
     /* --- Highlight on arrival --- */
     function highlightTerm(id) {
