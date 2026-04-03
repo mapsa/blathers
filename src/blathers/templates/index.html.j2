@@ -14,10 +14,13 @@
             {% endif %}
             {% if classes %}<li><a href="#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
             {% if classes %}<li>
-                <a href="#classes" class="toc-section-link">Classes <span class="toc-count">{{ classes | length }}</span></a>
+                <a href="#classes" class="toc-section-link">Classes <span class="toc-count">{{ classes | length + individuals | length }}</span></a>
                 <ul class="toc-sub">
                 {% for cls in classes %}
                     <li><a href="#{{ cls.local_name }}">{{ cls.local_name }}</a></li>
+                {% endfor %}
+                {% for ind in individuals %}
+                    <li><a href="#{{ ind.local_name }}">{{ ind.label or ind.local_name }}</a></li>
                 {% endfor %}
                 </ul>
             </li>{% endif %}
@@ -194,7 +197,7 @@
                 {% if cls.instances %}
                 <tr><th>Instances</th><td>
                     {% for ind in cls.instances %}
-                    <span class="instance-chip"{% if ind.comment %} title="{{ ind.comment }}"{% endif %}>{{ ind.label or ind.local_name }}</span>{% if not loop.last %} {% endif %}
+                    <a href="#{{ ind.local_name }}" class="instance-chip"{% if ind.comment %} title="{{ ind.comment }}"{% endif %}>{{ ind.label or ind.local_name }}</a>{% if not loop.last %} {% endif %}
                     {% endfor %}
                 </td></tr>
                 {% endif %}
@@ -215,6 +218,23 @@
             {% endif %}
         </div>
         {% endfor %}
+
+        {# ── Individual Definitions ── #}
+        {% if individuals %}
+        {% for ind in individuals %}
+        <div class="term-def" id="{{ ind.local_name }}">
+            <h3>{{ ind.prefixed_name }}
+            </h3>
+            <table class="term-contents">
+                <tr><th>Term</th><td><code>{{ ind.prefixed_name }}</code></td></tr>
+                {% if ind.label %}<tr><th>Label</th><td>{{ ind.label }}</td></tr>{% endif %}
+                <tr><th>IRI</th><td><code>{{ ind.iri }}</code></td></tr>
+                <tr><th>Type</th><td><code>owl:NamedIndividual</code>{% for t in ind.types %}, {{ t | term_link }}{% endfor %}</td></tr>
+                {% if ind.comment %}<tr><th>Definition</th><td>{{ ind.comment }}</td></tr>{% endif %}
+            </table>
+        </div>
+        {% endfor %}
+        {% endif %}
     </section>
     {% endif %}
 
