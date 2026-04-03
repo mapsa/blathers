@@ -1,0 +1,23 @@
+ontology: ontology/prism-minimal.ttl
+shacl: []
+examples: []
+sidecars: sidecars/
+figures: figures/
+output: dist/
+
+metadata:
+  title: "PRISM Example"
+  version: "0.1.0"
+  license: MIT
+  namespace: "http://example.org/prism#"
+  prefix: prism
+  status: "Draft"
+
+validation:
+  fail_on: error
+  rules:
+    shacl: false
+    consistency: true
+    completeness: false
+    conventions: true
+    overlap: false

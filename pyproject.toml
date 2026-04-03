@@ -7,14 +7,20 @@ name = "blathers"
 version = "1.0.0a1"
 description = "Ontology documentation & validation CLI — bridges auto-extracted OWL/SHACL definitions with Markdown narrative"
 readme = "README.md"
-license = "MIT"
+license = {text = "MIT"}
 requires-python = ">=3.10"
-authors = [{ name = "BigSpark" }]
+authors = [{ name = "Paola Arce", email = "paola@bigspark.dev" }]
 keywords = ["ontology", "owl", "shacl", "documentation", "rdf"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Documentation",
     "Topic :: Software Development :: Documentation",
 ]
@@ -28,6 +34,13 @@ dependencies = [
     "jinja2>=3.1",
     "pydantic>=2.5",
 ]
+
+[project.urls]
+Homepage = "https://github.com/mapsa/blathers"
+Documentation = "https://github.com/mapsa/blathers#readme"
+Repository = "https://github.com/mapsa/blathers"
+Issues = "https://github.com/mapsa/blathers/issues"
+Changelog = "https://github.com/mapsa/blathers/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

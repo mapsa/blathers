@@ -1,0 +1,34 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix vann:  <http://purl.org/vocab/vann/> .
+@prefix prism: <http://example.org/prism#> .
+
+<http://example.org/prism>
+    a owl:Ontology ;
+    rdfs:label "PRISM Example"@en ;
+    rdfs:comment "A minimal example ontology."@en ;
+    owl:versionInfo "0.1.0" ;
+    dcterms:license <https://spdx.org/licenses/MIT> ;
+    dcterms:creator "Example Author" ;
+    dcterms:title "PRISM Example" ;
+    vann:preferredNamespacePrefix "prism" ;
+    vann:preferredNamespaceUri "http://example.org/prism#" .
+
+prism:ComplianceRecord
+    a owl:Class ;
+    rdfs:label "Compliance Record"@en ;
+    rdfs:comment "A structured record providing evidence of compliance."@en .
+
+prism:RiskRecord
+    a owl:Class ;
+    rdfs:label "Risk Record"@en ;
+    rdfs:comment "Documents the risk management system."@en ;
+    rdfs:subClassOf prism:ComplianceRecord .
+
+prism:hasRecord
+    a owl:ObjectProperty ;
+    rdfs:label "has record"@en ;
+    rdfs:comment "Links a system to its compliance records."@en ;
+    rdfs:range prism:ComplianceRecord .
