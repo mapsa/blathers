@@ -53,10 +53,10 @@ def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties:
     all_iris = {c["iri"] for c in classes} | {p["iri"] for p in properties}
     if iri in all_iris:
         return f'<a href="#{anchor}">{pname}</a>'
-    # External IRI — make it a clickable link
+    # External IRI — make it a clickable link, same style as internal
     if iri.startswith("http"):
-        return f'<a href="{iri}" target="_blank"><code>{pname}</code></a>'
-    return f'<code>{pname}</code>'
+        return f'<a href="{iri}" target="_blank" class="external-term">{pname}</a>'
+    return f'{pname}'
 
 
 def _build_hierarchy(classes: list[dict], namespace: str, individuals: list[dict] | None = None) -> list[dict]:
