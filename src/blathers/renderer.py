@@ -327,7 +327,7 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 
 /* Smooth scroll + offset */
 html { scroll-behavior: smooth; }
-.term-def, section[id] { scroll-margin-top: 4rem; }
+.term-def, section[id], .shape-block { scroll-margin-top: 4.5rem; }
 
 /* Highlight animation */
 @keyframes term-flash { from { background: rgba(99,91,255,0.12); } to { background: transparent; } }
