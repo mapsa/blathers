@@ -56,12 +56,19 @@ def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties:
     return f'<code>{pname}</code>'
 
 
-def _build_hierarchy(classes: list[dict], namespace: str) -> list[dict]:
+def _build_hierarchy(classes: list[dict], namespace: str, individuals: list[dict] | None = None) -> list[dict]:
     """Build a nested tree from flat class list using superclasses/subclasses.
 
     Returns a list of root nodes, each with a 'children' list.
+    Individuals are included as leaf nodes under their parent class.
     """
     by_iri = {c["iri"]: c for c in classes}
+
+    # Build map of class IRI -> individuals that are instances of that class
+    ind_by_class: dict[str, list[dict]] = {}
+    for ind in (individuals or []):
+        for type_iri in ind.get("types", []):
+            ind_by_class.setdefault(type_iri, []).append(ind)
 
     # Find roots: classes whose superclasses are all outside the namespace
     roots = []
@@ -80,6 +87,18 @@ def _build_hierarchy(classes: list[dict], namespace: str) -> list[dict]:
             node = _build_node(child_iri, visited)
             if node:
                 children.append(node)
+        # Append individuals as leaf nodes
+        for ind in ind_by_class.get(iri, []):
+            children.append({
+                "iri": ind["iri"],
+                "local_name": ind["local_name"],
+                "prefixed_name": ind.get("prefixed_name", ind["local_name"]),
+                "label": ind.get("label"),
+                "comment": ind.get("comment"),
+                "children": [],
+                "is_individual": True,
+                "types": ind.get("types", []),
+            })
         return {
             "iri": iri,
             "local_name": cls["local_name"],
@@ -255,6 +274,12 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
                               position: relative; z-index: 1; }
 .hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; }
 
+/* Individual nodes in hierarchy */
+.tree-individual { font-style: italic; opacity: 0.75; font-weight: 400; }
+.tree-individual:hover { opacity: 1; }
+.instance-chip { display: inline-block; padding: 0.1rem 0.5rem; background: var(--code-bg);
+                 border-radius: 3px; font-size: 0.9em; margin: 0.1rem 0; }
+
 /* Tooltip */
 .hierarchy-tree .tree-term[title] { cursor: pointer; }
 
@@ -339,7 +364,7 @@ def render_site(manifest: dict, output_dir: Path) -> None:
     (assets_dir / "style.css").write_text(DEFAULT_CSS)
 
     # Build hierarchy tree
-    hierarchy = _build_hierarchy(all_classes, namespace)
+    hierarchy = _build_hierarchy(all_classes, namespace, manifest.get("individuals", []))
 
     # Common template context
     ctx = {

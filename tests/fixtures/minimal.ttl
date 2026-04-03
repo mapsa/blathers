@@ -35,3 +35,8 @@ ex:myProperty
     rdfs:comment "A test property."@en ;
     rdfs:domain ex:MyClass ;
     rdfs:range ex:MySubClass .
+
+ex:IndividualA
+    a ex:MyClass, owl:NamedIndividual ;
+    rdfs:label "Individual A"@en ;
+    rdfs:comment "A test individual."@en .

@@ -142,10 +142,22 @@
     <ul>
         {% for node in nodes %}
         <li>
+            {% if node.is_individual %}
+            <a href="#{{ node.local_name }}" class="tree-term tree-individual"
+               data-term-id="{{ node.local_name }}"
+               data-is-individual="true"
+               data-label="{{ node.label or node.local_name }}"
+               data-iri="{{ node.iri }}"
+               {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
+               {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
+               {% if node.comment %}title="{{ node.comment }}"{% endif %}
+            >{{ node.label or node.local_name }}</a>
+            {% else %}
             <a href="#{{ node.local_name }}" class="tree-term"
                data-term-id="{{ node.local_name }}"
                {% if node.comment %}title="{{ node.comment }}"{% endif %}
             >{{ node.label or node.local_name }}</a>
+            {% endif %}
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
@@ -188,6 +200,13 @@
                 {% if cls.subclasses %}
                 <tr><th>Narrower/Child types</th><td>
                     {% for sc in cls.subclasses %}{{ sc | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}
+                </td></tr>
+                {% endif %}
+                {% if cls.instances %}
+                <tr><th>Instances</th><td>
+                    {% for ind in cls.instances %}
+                    <span class="instance-chip">{{ ind.label or ind.local_name }}</span>{% if not loop.last %}, {% endif %}
+                    {% endfor %}
                 </td></tr>
                 {% endif %}
                 {% if cls.subject_of %}
@@ -347,13 +366,41 @@
         treeTerms[i].addEventListener('click', function(e){
             e.preventDefault();
             var termId = this.getAttribute('data-term-id');
-            var termDef = document.getElementById(termId);
+            var isIndividual = this.getAttribute('data-is-individual') === 'true';
 
             /* Update selected state */
             for (var j = 0; j < treeTerms.length; j++) treeTerms[j].classList.remove('selected');
             this.classList.add('selected');
 
-            if (!termDef || !detailPanel) return;
+            if (!detailPanel) return;
+
+            if (isIndividual) {
+                /* Build detail panel from data attributes for individuals */
+                var indLabel = this.getAttribute('data-label') || termId;
+                var indIri = this.getAttribute('data-iri') || '';
+                var indComment = this.getAttribute('data-comment') || '';
+                var indTypes = this.getAttribute('data-types') || '';
+
+                var html = '<h3>' + indLabel + '</h3>';
+                if (indIri) html += '<div class="detail-iri"><code>' + indIri + '</code></div>';
+                html += '<div class="detail-row"><dt>Type</dt><dd><code>owl:NamedIndividual</code></dd></div>';
+                if (indComment) html += '<div class="detail-def">' + indComment + '</div>';
+                if (indTypes) {
+                    var typeList = indTypes.split(',');
+                    html += '<div class="detail-row"><dt>Instance of</dt><dd>';
+                    for (var t = 0; t < typeList.length; t++) {
+                        if (t > 0) html += ', ';
+                        html += '<code>' + typeList[t] + '</code>';
+                    }
+                    html += '</dd></div>';
+                }
+
+                detailPanel.innerHTML = html;
+                return;
+            }
+
+            var termDef = document.getElementById(termId);
+            if (!termDef) return;
 
             /* Extract data from term definition table */
             var label = termDef.querySelector('h3');
@@ -373,6 +420,7 @@
             if (info['Definition']) html += '<div class="detail-def">' + info['Definition'] + '</div>';
             if (info['Broader/Parent types']) html += '<div class="detail-row"><dt>Parent types</dt><dd>' + info['Broader/Parent types'] + '</dd></div>';
             if (info['Narrower/Child types']) html += '<div class="detail-row"><dt>Child types</dt><dd>' + info['Narrower/Child types'] + '</dd></div>';
+            if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
             if (info['Subject of']) html += '<div class="detail-row"><dt>Subject of</dt><dd>' + info['Subject of'] + '</dd></div>';
             if (info['Object of']) html += '<div class="detail-row"><dt>Object of</dt><dd>' + info['Object of'] + '</dd></div>';
             html += '<a href="#' + termId + '" class="detail-link">Go to full definition &darr;</a>';

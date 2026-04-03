@@ -71,6 +71,28 @@ def test_manifest_has_validation_summary(fixtures_dir: Path):
     assert manifest["validation_summary"]["warnings"] == 1
 
 
+def test_manifest_class_has_instances(fixtures_dir: Path):
+    config = load_config(fixtures_dir / "blathers.yaml")
+    data = extract_ontology(config.resolve_path(config.ontology))
+    sidecars = load_sidecars(config.resolve_path(config.sidecars))
+    manifest = build_manifest(config, data, sidecars, [])
+    my_class = next(c for c in manifest["classes"] if c["local_name"] == "MyClass")
+    assert len(my_class["instances"]) >= 1
+    ind = next(i for i in my_class["instances"] if i["local_name"] == "IndividualA")
+    assert ind["label"] == "Individual A"
+
+
+def test_manifest_has_individuals_list(fixtures_dir: Path):
+    config = load_config(fixtures_dir / "blathers.yaml")
+    data = extract_ontology(config.resolve_path(config.ontology))
+    sidecars = load_sidecars(config.resolve_path(config.sidecars))
+    manifest = build_manifest(config, data, sidecars, [])
+    assert "individuals" in manifest
+    assert len(manifest["individuals"]) >= 1
+    ind = next(i for i in manifest["individuals"] if i["local_name"] == "IndividualA")
+    assert "http://example.org/test#MyClass" in ind["types"]
+
+
 def test_manifest_is_json_serializable(fixtures_dir: Path):
     config = load_config(fixtures_dir / "blathers.yaml")
     data = extract_ontology(config.resolve_path(config.ontology))

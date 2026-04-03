@@ -54,6 +54,14 @@ def test_extract_shapes(fixtures_dir: Path):
     assert shape.target_class == "http://example.org/test#MyClass"
 
 
+def test_extract_individuals(fixtures_dir: Path):
+    data = extract_ontology(fixtures_dir / "minimal.ttl")
+    assert len(data.individuals) >= 1
+    ind = next(i for i in data.individuals if i.local_name == "IndividualA")
+    assert ind.label == "Individual A"
+    assert "http://example.org/test#MyClass" in ind.types
+
+
 def test_extract_namespace(fixtures_dir: Path):
     data = extract_ontology(fixtures_dir / "minimal.ttl")
     assert data.namespace == "http://example.org/test#"

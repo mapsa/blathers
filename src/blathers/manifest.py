@@ -70,6 +70,17 @@ def build_manifest(
         if prop.range:
             object_of_map.setdefault(prop.range, []).append(prop.iri)
 
+    # Build a map of class IRI -> list of individuals that are instances of that class
+    class_instances_map: dict[str, list[dict]] = {}
+    for ind in data.individuals:
+        for type_iri in ind.types:
+            class_instances_map.setdefault(type_iri, []).append({
+                "iri": ind.iri,
+                "local_name": ind.local_name,
+                "label": ind.label,
+                "prefixed_name": _prefixed_name(ind.iri, prefix, namespace),
+            })
+
     classes = []
     for cls in data.classes:
         sc = _match_sidecar(cls.iri, prefix, namespace, sidecars)
@@ -84,6 +95,7 @@ def build_manifest(
             "properties": cls.properties,
             "subject_of": subject_of_map.get(cls.iri, []),
             "object_of": object_of_map.get(cls.iri, []),
+            "instances": class_instances_map.get(cls.iri, []),
             "sidecar": sc.html if sc else None,
         })
 
@@ -98,6 +110,17 @@ def build_manifest(
                 {"path": c.path, "min_count": c.min_count, "max_count": c.max_count, "node_class": c.node_class}
                 for c in shape.constraints
             ],
+        })
+
+    individuals = []
+    for ind in data.individuals:
+        individuals.append({
+            "iri": ind.iri,
+            "local_name": ind.local_name,
+            "prefixed_name": _prefixed_name(ind.iri, prefix, namespace),
+            "label": ind.label,
+            "comment": ind.comment,
+            "types": ind.types,
         })
 
     sections = []
@@ -138,6 +161,7 @@ def build_manifest(
         },
         "classes": classes,
         "properties": properties,
+        "individuals": individuals,
         "shapes": shapes,
         "sections": sections,
         "conneg": {

@@ -62,12 +62,22 @@ class ExtractedShape:
 
 
 @dataclass
+class ExtractedIndividual:
+    iri: str
+    local_name: str
+    label: str | None = None
+    comment: str | None = None
+    types: list[str] = field(default_factory=list)  # classes this is an instance of
+
+
+@dataclass
 class OntologyData:
     namespace: str
     metadata: dict[str, str]
     classes: list[ExtractedClass]
     properties: list[ExtractedProperty]
     shapes: list[ExtractedShape]
+    individuals: list[ExtractedIndividual]
     graph: Graph
 
 
@@ -188,6 +198,30 @@ def _extract_shapes(g: Graph) -> list[ExtractedShape]:
     return shapes
 
 
+def _extract_individuals(g: Graph, namespace: str) -> list[ExtractedIndividual]:
+    """Extract all owl:NamedIndividual subjects in the ontology namespace."""
+    individuals = []
+    for ind_iri in g.subjects(RDF.type, OWL.NamedIndividual):
+        iri_str = str(ind_iri)
+        if not iri_str.startswith(namespace):
+            continue
+        label = _str_or_none(g.value(ind_iri, RDFS.label))
+        comment = _str_or_none(g.value(ind_iri, RDFS.comment))
+        types = [
+            str(t)
+            for t in g.objects(ind_iri, RDF.type)
+            if isinstance(t, URIRef) and str(t) != str(OWL.NamedIndividual)
+        ]
+        individuals.append(ExtractedIndividual(
+            iri=iri_str,
+            local_name=_local_name(iri_str),
+            label=label,
+            comment=comment,
+            types=types,
+        ))
+    return individuals
+
+
 def _populate_class_properties(classes: list[ExtractedClass], properties: list[ExtractedProperty]) -> None:
     """Link properties to their domain classes."""
     class_map = {c.iri: c for c in classes}
@@ -227,6 +261,7 @@ def extract_ontology(
     classes = _extract_classes(g, namespace)
     properties = _extract_properties(g, namespace)
     shapes = _extract_shapes(g)
+    individuals = _extract_individuals(g, namespace)
     _populate_class_properties(classes, properties)
 
     return OntologyData(
@@ -235,5 +270,6 @@ def extract_ontology(
         classes=classes,
         properties=properties,
         shapes=shapes,
+        individuals=individuals,
         graph=g,
     )
