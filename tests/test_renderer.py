@@ -104,7 +104,7 @@ def test_render_index_has_metadata_header(fixtures_dir: Path, tmp_path: Path):
     render_site(manifest, tmp_path)
     content = (tmp_path / "index.html").read_text()
     assert 'class="respec-header"' in content
-    assert 'class="metadata-dl"' in content
+    assert "Namespace:" in content
     assert "http://example.org/test#" in content
     assert "0.1.0" in content
 

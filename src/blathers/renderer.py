@@ -141,6 +141,13 @@ header .version { font-size: 0.85rem; color: var(--accent); }
 .sidebar li { margin: 0.15rem 0; }
 .sidebar a { text-decoration: none; color: var(--fg); }
 .sidebar a:hover { color: var(--accent); }
+.toc-collapsible { margin: 0; }
+.toc-collapsible summary { cursor: pointer; list-style: none; }
+.toc-collapsible summary::-webkit-details-marker { display: none; }
+.toc-collapsible summary::before { content: "\\25B6"; font-size: 0.6em; margin-right: 0.4em; display: inline-block; transition: transform 0.15s; }
+.toc-collapsible[open] summary::before { transform: rotate(90deg); }
+.toc-collapsible summary a { font-weight: 500; }
+.toc-count { color: #999; font-size: 0.8em; font-weight: normal; }
 
 /* Content area */
 .content { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
@@ -161,19 +168,15 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 /* ReSpec-style metadata header */
 .respec-header { margin-bottom: 2rem; }
 .respec-header h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-.respec-header .subtitle { font-size: 1.2rem; color: #666; margin-bottom: 0.5rem; }
-.respec-header .doc-status { color: var(--accent); font-size: 1.1rem; margin-bottom: 1rem; }
-.respec-header dl { margin: 0; }
-.respec-header dt { font-weight: 700; min-width: 200px; display: block; margin-top: 0.5rem; }
-.respec-header dd { margin-left: 1rem; margin-bottom: 0.25rem; }
-.respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 0.75rem; }
-
-/* Legacy metadata-dl (kept for backward compat) */
-.metadata-dl { margin: 1rem 0 2rem; padding: 1rem; background: var(--nav-bg); border: 1px solid var(--border); border-radius: 4px; }
-.metadata-dl dt { font-weight: 600; display: inline; margin-right: 0.5rem; }
-.metadata-dl dt::after { content: ":"; }
-.metadata-dl dd { display: inline; margin: 0 1.5rem 0 0; }
-.metadata-dl .metadata-row { margin-bottom: 0.3rem; }
+.respec-header .subtitle { font-size: 1.2rem; color: #666; margin-bottom: 0.75rem; }
+[data-theme="dark"] .respec-header .subtitle { color: #aaa; }
+.respec-header .doc-status { color: var(--accent); font-size: 1.1rem; margin-bottom: 1.5rem; }
+.respec-header dl { margin: 0 0 1.5rem; }
+.respec-header dt { font-weight: 700; margin-top: 0.6rem; margin-bottom: 0.1rem; }
+.respec-header dd { margin: 0 0 0.1rem 1.5rem; }
+.respec-header .copyright { font-size: 0.85rem; color: #666; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+[data-theme="dark"] .respec-header .copyright { color: #aaa; }
+.respec-header .contributors { font-size: 0.9rem; margin-top: 0.75rem; }
 
 /* Table of Contents (inline fallback) */
 .toc { background: var(--toc-bg); border: 1px solid var(--border); border-radius: 4px; padding: 1rem 1.5rem; margin: 1.5rem 0; }
