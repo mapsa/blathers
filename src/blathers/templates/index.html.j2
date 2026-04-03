@@ -450,8 +450,6 @@
             if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
             if (info['Subject of']) html += '<div class="detail-row"><dt>Subject of</dt><dd>' + info['Subject of'] + '</dd></div>';
             if (info['Object of']) html += '<div class="detail-row"><dt>Object of</dt><dd>' + info['Object of'] + '</dd></div>';
-            var iriText = info['IRI'] || '';
-            html += '<div class="detail-iri">' + linkifyIri(iriText) + '</div>';
             html += '<a href="#' + termId + '" class="detail-link">Go to full definition &darr;</a>';
 
             detailPanel.innerHTML = html;
