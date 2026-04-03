@@ -423,13 +423,23 @@
                 if (th && td) info[th.textContent.trim()] = td.innerHTML;
             }
 
-            /* Build detail panel HTML — focus on what the tree doesn't show */
+            /* Helper to make IRIs clickable */
+            function linkifyIri(html) {
+                return html.replace(/<code>(https?:\/\/[^<]+)<\/code>/g, function(m, url) {
+                    return '<code><a href="' + url + '" target="_blank">' + url + '</a></code>';
+                });
+            }
+
+            /* Build detail panel HTML */
             var html = '<h3>' + labelText + '</h3>';
             if (info['Definition']) html += '<div class="detail-def">' + info['Definition'] + '</div>';
+            if (info['Broader/Parent types']) html += '<div class="detail-row"><dt>Parent types</dt><dd>' + linkifyIri(info['Broader/Parent types']) + '</dd></div>';
+            if (info['Narrower/Child types']) html += '<div class="detail-row"><dt>Child types</dt><dd>' + info['Narrower/Child types'] + '</dd></div>';
+            if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
             if (info['Subject of']) html += '<div class="detail-row"><dt>Subject of</dt><dd>' + info['Subject of'] + '</dd></div>';
             if (info['Object of']) html += '<div class="detail-row"><dt>Object of</dt><dd>' + info['Object of'] + '</dd></div>';
-            if (info['Instances']) html += '<div class="detail-row"><dt>Instances</dt><dd>' + info['Instances'] + '</dd></div>';
-            if (info['IRI']) html += '<div class="detail-iri">' + info['IRI'] + '</div>';
+            var iriText = info['IRI'] || '';
+            html += '<div class="detail-iri">' + linkifyIri(iriText) + '</div>';
             html += '<a href="#' + termId + '" class="detail-link">Go to full definition &darr;</a>';
 
             detailPanel.innerHTML = html;

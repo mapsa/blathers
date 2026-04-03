@@ -53,6 +53,9 @@ def _term_link(iri: str, prefix: str, namespace: str, classes: list, properties:
     all_iris = {c["iri"] for c in classes} | {p["iri"] for p in properties}
     if iri in all_iris:
         return f'<a href="#{anchor}">{pname}</a>'
+    # External IRI — make it a clickable link
+    if iri.startswith("http"):
+        return f'<a href="{iri}" target="_blank"><code>{pname}</code></a>'
     return f'<code>{pname}</code>'
 
 
@@ -275,12 +278,18 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .hierarchy-tree li li::after { content: ""; position: absolute; left: 0.6rem; top: 1.1rem;
                                 width: 1rem; border-top: 2px solid var(--accent); opacity: 0.25; }
 
-/* Class chips — bold, prominent */
-.hierarchy-tree .tree-term { display: inline-block; padding: 0.25rem 0.75rem; margin: 0.2rem 0;
+/* Root class chips — bold, prominent */
+.hierarchy-tree > ul > li > .tree-term { display: inline-block; padding: 0.3rem 0.85rem; margin: 0.25rem 0;
                               border-radius: 6px; text-decoration: none; color: var(--fg);
-                              font-weight: 600; font-size: 0.9rem; transition: all 0.15s;
+                              font-weight: 700; font-size: 0.95rem; transition: all 0.15s;
                               position: relative; z-index: 1; background: var(--code-bg);
-                              border: 1px solid transparent; }
+                              border: 1px solid var(--border); }
+/* Child class chips — lighter, smaller */
+.hierarchy-tree .tree-term { display: inline-block; padding: 0.2rem 0.65rem; margin: 0.15rem 0;
+                              border-radius: 6px; text-decoration: none; color: var(--fg);
+                              font-weight: 500; font-size: 0.85rem; transition: all 0.15s;
+                              position: relative; z-index: 1; background: transparent;
+                              border: 1px solid var(--border); }
 .hierarchy-tree .tree-term:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* Individual nodes — lighter pill style, dashed border */
