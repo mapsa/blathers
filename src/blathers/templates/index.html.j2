@@ -143,35 +143,29 @@
     {% set individual_nodes = nodes | selectattr('is_individual') | list %}
     <ul>
         {% for node in class_nodes %}
+        {% set node_individuals = node.children | selectattr('is_individual') | list %}
         <li>
             <a href="#{{ node.local_name }}" class="tree-term"
                data-term-id="{{ node.local_name }}"
                {% if node.comment %}title="{{ node.comment }}"{% endif %}
-            >{{ node.label or node.local_name }}</a>
+            >{{ node.label or node.local_name }}{% if node_individuals %} <span class="instance-badge">{{ node_individuals | length }}</span>{% endif %}</a>
             {% if node.children %}{{ render_tree(node.children) }}{% endif %}
         </li>
         {% endfor %}
         {% if individual_nodes %}
-        <li class="individuals-group">
-            <details class="individuals-toggle">
-                <summary>{{ individual_nodes | length }} instance{{ 's' if individual_nodes | length > 1 }}</summary>
-                <ul class="individuals-list">
-                {% for node in individual_nodes %}
-                    <li>
-                        <a href="#{{ node.local_name }}" class="tree-term tree-individual"
-                           data-term-id="{{ node.local_name }}"
-                           data-is-individual="true"
-                           data-label="{{ node.label or node.local_name }}"
-                           data-iri="{{ node.iri }}"
-                           {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
-                           {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
-                           {% if node.comment %}title="{{ node.comment }}"{% endif %}
-                        >{{ node.label or node.local_name }}</a>
-                    </li>
-                {% endfor %}
-                </ul>
-            </details>
-        </li>
+        {% for node in individual_nodes %}
+            <li class="individual-item">
+                <a href="#{{ node.local_name }}" class="tree-term tree-individual"
+                   data-term-id="{{ node.local_name }}"
+                   data-is-individual="true"
+                   data-label="{{ node.label or node.local_name }}"
+                   data-iri="{{ node.iri }}"
+                   {% if node.comment %}data-comment="{{ node.comment }}"{% endif %}
+                   {% if node.types %}data-types="{{ node.types | join(',') }}"{% endif %}
+                   {% if node.comment %}title="{{ node.comment }}"{% endif %}
+                >{{ node.label or node.local_name }}</a>
+            </li>
+        {% endfor %}
         {% endif %}
     </ul>
     {% endmacro %}
@@ -370,6 +364,21 @@
     }
     window.addEventListener('scroll', updateSpy);
     updateSpy();
+
+    /* --- Toggle individuals on badge click --- */
+    var badges = document.querySelectorAll('.instance-badge');
+    for (var i = 0; i < badges.length; i++) {
+        badges[i].addEventListener('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var li = this.closest('li');
+            if (!li) return;
+            var siblings = li.parentNode.querySelectorAll(':scope > .individual-item');
+            for (var j = 0; j < siblings.length; j++) {
+                siblings[j].classList.toggle('show');
+            }
+        });
+    }
 
     /* --- Hierarchy Detail Panel --- */
     var detailPanel = document.getElementById('hierarchy-detail');
