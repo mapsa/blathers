@@ -10,10 +10,25 @@ from rdflib import Graph
 from blathers.config import ImportConfig
 
 
-def uri_to_cache_filename(uri: str) -> str:
+def uri_to_cache_filename(uri: str, profile: str | None = None) -> str:
     safe = re.sub(r"[^a-zA-Z0-9._-]", "_", uri)
     safe = re.sub(r"_+", "_", safe)
+    if profile:
+        safe = f"{safe}__{profile}"
     return safe + ".ttl"
+
+
+def _resolve_uri(uri: str, profile: str | None) -> str:
+    """Apply profile to a URI for content negotiation.
+
+    For vocabularies that support profile-based conneg (e.g., DPV),
+    appending the profile to the URI path selects the variant:
+      https://w3id.org/dpv/ai + profile "owl" → https://w3id.org/dpv/ai/owl
+    """
+    if not profile:
+        return uri
+    base = uri.rstrip("/")
+    return f"{base}/{profile}"
 
 
 class ImportResolver:
@@ -28,6 +43,7 @@ class ImportResolver:
         self.cache_dir = cache_dir
 
     def resolve(self, imp: ImportConfig) -> Graph | None:
+        # 1. Try local path first
         if imp.path:
             local = self.project_dir / imp.path
             if local.exists():
@@ -35,16 +51,21 @@ class ImportResolver:
                 g.parse(str(local), format="turtle")
                 return g
 
-        cache_file = self.cache_dir / uri_to_cache_filename(imp.uri)
+        # 2. Try cache (profile-specific)
+        cache_file = self.cache_dir / uri_to_cache_filename(
+            imp.uri, imp.profile
+        )
         if cache_file.exists():
             g = Graph()
             g.parse(str(cache_file), format="turtle")
             return g
 
+        # 3. Fetch remotely with profile-resolved URI
+        fetch_uri = _resolve_uri(imp.uri, imp.profile)
         try:
             g = Graph()
-            g.parse(imp.uri)
-            self._cache_graph(g, imp.uri)
+            g.parse(fetch_uri)
+            self._cache_graph(g, imp.uri, imp.profile)
             return g
         except Exception:
             return None
@@ -64,15 +85,18 @@ class ImportResolver:
                 local = self.project_dir / imp.path
                 if local.exists():
                     g.parse(str(local), format="turtle")
-                    self._cache_graph(g, imp.uri)
+                    self._cache_graph(g, imp.uri, imp.profile)
                     return True
-            g.parse(imp.uri)
-            self._cache_graph(g, imp.uri)
+            fetch_uri = _resolve_uri(imp.uri, imp.profile)
+            g.parse(fetch_uri)
+            self._cache_graph(g, imp.uri, imp.profile)
             return True
         except Exception:
             return False
 
-    def _cache_graph(self, g: Graph, uri: str) -> None:
+    def _cache_graph(
+        self, g: Graph, uri: str, profile: str | None = None
+    ) -> None:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = self.cache_dir / uri_to_cache_filename(uri)
+        cache_file = self.cache_dir / uri_to_cache_filename(uri, profile)
         g.serialize(str(cache_file), format="turtle")

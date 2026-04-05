@@ -34,9 +34,14 @@ class ShaclValidator:
         for sp in self.shacl_paths:
             shapes_graph.parse(str(sp), format="turtle")
 
-        # Build the ontology graph from resolved imports so pyshacl
-        # can resolve class hierarchies (e.g. sh:class dpv:Sector)
+        # Build the ontology graph: local ontology + resolved imports.
+        # pyshacl uses ont_graph for class hierarchy resolution
+        # (e.g. sh:class dpv:Sector needs to know nace:K is a dpv:Sector).
+        # The local ontology must also be in ont_graph so pyshacl can
+        # verify class memberships defined there (e.g. prism:Attested
+        # a prism:AttestationStatus).
         ont_graph = Graph()
+        ont_graph.parse(str(self.ontology_path), format="turtle")
         for g in self.import_graphs:
             ont_graph += g
 

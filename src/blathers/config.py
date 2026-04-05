@@ -13,6 +13,7 @@ class ImportConfig(BaseModel):
     uri: str
     prefix: str
     path: Optional[str] = None
+    profile: Optional[str] = None  # "owl" or "skos"; when set, appends to URI for conneg
 
 
 class PersonConfig(BaseModel):
