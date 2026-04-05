@@ -70,48 +70,69 @@
         {% endif %}
 
         <dl>
+            <div class="dl-group">
             <dt>This version:</dt>
-            <dd><a href="{{ conneg.base_uri or metadata.namespace }}">{{ conneg.base_uri or metadata.namespace }}</a></dd>
+            <div class="dl-values"><dd><a href="{{ conneg.base_uri or metadata.namespace }}">{{ conneg.base_uri or metadata.namespace }}</a></dd></div>
+            </div>
 
             {% if metadata.previous_version %}
+            <div class="dl-group">
             <dt>Previous version:</dt>
-            <dd><a href="{{ metadata.previous_version }}">{{ metadata.previous_version }}</a></dd>
+            <div class="dl-values"><dd><a href="{{ metadata.previous_version }}">{{ metadata.previous_version }}</a></dd></div>
+            </div>
             {% endif %}
 
             {% if metadata.editors %}
+            <div class="dl-group">
             <dt>Editor{{ 's' if metadata.editors | length > 1 }}:</dt>
+            <div class="dl-values">
             {% for ed in metadata.editors %}
             <dd>{% if ed.url %}<a href="{{ ed.url }}">{{ ed.name }}</a>{% else %}{{ ed.name }}{% endif %}{% if ed.orcid %} <a href="https://orcid.org/{{ ed.orcid }}" class="orcid-link" title="ORCID"><svg class="orcid-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path fill="#a6ce39" d="M128 0C57.3 0 0 57.3 0 128s57.3 128 128 128 128-57.3 128-128S198.7 0 128 0zM86.3 186.2H70.9V79.1h15.4v107.1zM78.6 70.6c-5.7 0-10.3-4.6-10.3-10.3s4.6-10.3 10.3-10.3 10.3 4.6 10.3 10.3-4.6 10.3-10.3 10.3zM196.9 186.2h-15.4v-55.8c0-17.3-6.5-29.2-21.7-29.2-11.8 0-18.9 8-22 15.6-.7 1.8-1.2 5.5-1.2 7.4v62h-15.4V79.1h15.4v14.8c5.7-8.6 15.2-14.8 27.7-14.8 20.2 0 32.6 13.2 32.6 41.5v65.6z"/></svg></a>{% endif %}{% if ed.affiliation %} ({{ ed.affiliation }}){% endif %}</dd>
             {% endfor %}
+            </div>
+            </div>
             {% endif %}
 
             {% if metadata.authors %}
+            <div class="dl-group">
             <dt>Author{{ 's' if metadata.authors | length > 1 }}:</dt>
+            <div class="dl-values">
             {% for au in metadata.authors %}
             <dd>{% if au.url %}<a href="{{ au.url }}">{{ au.name }}</a>{% else %}{{ au.name }}{% endif %}{% if au.orcid %} <a href="https://orcid.org/{{ au.orcid }}" class="orcid-link" title="ORCID"><svg class="orcid-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><path fill="#a6ce39" d="M128 0C57.3 0 0 57.3 0 128s57.3 128 128 128 128-57.3 128-128S198.7 0 128 0zM86.3 186.2H70.9V79.1h15.4v107.1zM78.6 70.6c-5.7 0-10.3-4.6-10.3-10.3s4.6-10.3 10.3-10.3 10.3 4.6 10.3 10.3-4.6 10.3-10.3 10.3zM196.9 186.2h-15.4v-55.8c0-17.3-6.5-29.2-21.7-29.2-11.8 0-18.9 8-22 15.6-.7 1.8-1.2 5.5-1.2 7.4v62h-15.4V79.1h15.4v14.8c5.7-8.6 15.2-14.8 27.7-14.8 20.2 0 32.6 13.2 32.6 41.5v65.6z"/></svg></a>{% endif %}{% if au.affiliation %} ({{ au.affiliation }}){% endif %}</dd>
             {% endfor %}
+            </div>
+            </div>
             {% endif %}
 
             {% if metadata.repository %}
+            <div class="dl-group">
             <dt>Feedback:</dt>
-            <dd><a href="{{ metadata.repository }}">{{ metadata.repository }}</a>
+            <div class="dl-values"><dd><a href="{{ metadata.repository }}">{{ metadata.repository }}</a>
                 (<a href="{{ metadata.repository }}/pulls">pull requests</a>,
                  <a href="{{ metadata.repository }}/issues/new">new issue</a>,
-                 <a href="{{ metadata.repository }}/issues">open issues</a>)</dd>
+                 <a href="{{ metadata.repository }}/issues">open issues</a>)</dd></div>
+            </div>
             {% endif %}
 
+            <div class="dl-group">
             <dt>Namespace:</dt>
-            <dd><code>{{ metadata.namespace }}</code></dd>
+            <div class="dl-values"><dd><code>{{ metadata.namespace }}</code></dd></div>
+            </div>
 
+            <div class="dl-group">
             <dt>Prefix:</dt>
-            <dd><code>{{ metadata.prefix }}</code></dd>
+            <div class="dl-values"><dd><code>{{ metadata.prefix }}</code></dd></div>
+            </div>
 
+            <div class="dl-group">
             <dt>License:</dt>
-            <dd>{{ metadata.license }}</dd>
+            <div class="dl-values"><dd>{{ metadata.license }}</dd></div>
+            </div>
 
             {% if conneg.formats %}
+            <div class="dl-group">
             <dt>Serializations:</dt>
-            <dd>
+            <div class="dl-values"><dd>
                 {% for fmt in conneg.formats %}
                     {% if fmt == 'ttl' %}<a href="ontology.ttl">Turtle</a>{% endif %}
                     {% if fmt == 'jsonld' %}<a href="ontology.jsonld">JSON-LD</a>{% endif %}
@@ -119,7 +140,8 @@
                     {% if fmt == 'owl' %}<a href="ontology.owl">RDF/XML</a>{% endif %}
                     {% if not loop.last %} | {% endif %}
                 {% endfor %}
-            </dd>
+            </dd></div>
+            </div>
             {% endif %}
         </dl>
 
