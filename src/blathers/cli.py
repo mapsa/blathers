@@ -94,6 +94,14 @@ def validate(config_path: str) -> None:
 
     all_results = []
 
+    # Resolve imports (shared by SHACL and Overlap validators)
+    resolver = ImportResolver(
+        imports=config.imports,
+        project_dir=config._config_dir,
+        cache_dir=config._config_dir / ".blathers" / "imports",
+    )
+    imported_graphs = resolver.resolve_all()
+
     # SHACL
     if config.validation.rules.shacl:
         from blathers.validators.shacl import ShaclValidator
@@ -107,6 +115,7 @@ def validate(config_path: str) -> None:
             ontology_path=config.resolve_path(config.ontology),
             shacl_paths=shacl_paths,
             example_paths=example_paths,
+            import_graphs=list(imported_graphs.values()),
         )
         results = v.validate()
         _print_validator_results("SHACL", results)
@@ -151,12 +160,6 @@ def validate(config_path: str) -> None:
     if config.validation.rules.overlap:
         from blathers.validators.overlap import OverlapValidator
 
-        resolver = ImportResolver(
-            imports=config.imports,
-            project_dir=config._config_dir,
-            cache_dir=config._config_dir / ".blathers" / "imports",
-        )
-        imported_graphs = resolver.resolve_all()
         allowlist = set()
         if config.validation.overlap and isinstance(config.validation.overlap, dict):
             allowlist = set(config.validation.overlap.get("allow", []))

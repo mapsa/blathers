@@ -17,10 +17,12 @@ class ShaclValidator:
         ontology_path: Path,
         shacl_paths: list[Path],
         example_paths: list[Path],
+        import_graphs: list[Graph] | None = None,
     ) -> None:
         self.ontology_path = ontology_path
         self.shacl_paths = shacl_paths
         self.example_paths = example_paths
+        self.import_graphs = import_graphs or []
 
     def validate(self) -> list[ValidationResult]:
         if not self.example_paths:
@@ -32,25 +34,42 @@ class ShaclValidator:
         for sp in self.shacl_paths:
             shapes_graph.parse(str(sp), format="turtle")
 
+        # Build the ontology graph from resolved imports so pyshacl
+        # can resolve class hierarchies (e.g. sh:class dpv:Sector)
+        ont_graph = Graph()
+        for g in self.import_graphs:
+            ont_graph += g
+
         results: list[ValidationResult] = []
 
         for example_path in self.example_paths:
             data_graph = Graph()
             data_graph.parse(str(example_path), format="turtle")
-            results.extend(self._validate_one(data_graph, shapes_graph))
+            results.extend(
+                self._validate_one(data_graph, shapes_graph, ont_graph)
+            )
 
         return results
 
     def _validate_one(
-        self, data_graph: Graph, shapes_graph: Graph
+        self,
+        data_graph: Graph,
+        shapes_graph: Graph,
+        ont_graph: Graph | None = None,
     ) -> list[ValidationResult]:
         from pyshacl import validate as shacl_validate
 
-        conforms, results_graph, results_text = shacl_validate(
-            data_graph,
+        kwargs: dict = dict(
             shacl_graph=shapes_graph,
             inference="none",
             abort_on_first=False,
+        )
+        if ont_graph and len(ont_graph) > 0:
+            kwargs["ont_graph"] = ont_graph
+
+        conforms, results_graph, results_text = shacl_validate(
+            data_graph,
+            **kwargs,
         )
 
         if conforms:
