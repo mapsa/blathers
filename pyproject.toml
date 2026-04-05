@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blathers"
-version = "1.0.0a4"
+version = "1.0.0a5"
 description = "Ontology documentation & validation CLI — bridges auto-extracted OWL/SHACL definitions with Markdown narrative"
 readme = "README.md"
 license = {text = "MIT"}
