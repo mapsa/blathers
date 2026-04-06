@@ -199,7 +199,7 @@
         {% for cls in classes %}
         <div class="term-def" id="{{ cls.local_name }}">
             <h3>{{ cls.prefixed_name }}
-                <a href="classes/{{ cls.local_name }}.html" title="Standalone page" style="font-size:0.75em; font-weight:normal;">&#x1f517;</a>
+                <a href="classes/{{ cls.local_name }}.html" title="Standalone page" class="term-detail-link">details &rarr;</a>
             </h3>
             <table class="term-contents">
                 <tr><th>Term</th><td><code>{{ cls.prefixed_name }}</code></td></tr>
@@ -267,7 +267,7 @@
         {% for prop in properties %}
         <div class="term-def" id="{{ prop.local_name }}">
             <h3>{{ prop.prefixed_name }}
-                <a href="properties/{{ prop.local_name }}.html" title="Standalone page" style="font-size:0.75em; font-weight:normal;">&#x1f517;</a>
+                <a href="properties/{{ prop.local_name }}.html" title="Standalone page" class="term-detail-link">details &rarr;</a>
             </h3>
             <table class="term-contents">
                 <tr><th>Term</th><td><code>{{ prop.prefixed_name }}</code></td></tr>

@@ -46,6 +46,8 @@ Changelog = "https://github.com/mapsa/blathers/blob/main/CHANGELOG.md"
 dev = [
     "pytest>=8.0",
     "pytest-tmp-files>=0.0.2",
+    "build>=1.0",
+    "twine>=5.0",
 ]
 
 [project.scripts]

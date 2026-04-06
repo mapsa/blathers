@@ -52,6 +52,41 @@
         {% if term.comment %}<tr><th>Definition</th><td>{{ term.comment }}</td></tr>{% endif %}
     </table>
 
+    {% if term.applicability_conditions %}
+    <section class="applicability-conditions">
+        <h2>Applicability Conditions</h2>
+        <p>This record is required when any of the following conditions is met.
+        Each card is a <code>prism:ApplicabilityCondition</code> instance —
+        all properties within a card must hold (conjunction);
+        any card is sufficient to trigger the obligation (disjunction).</p>
+        {% for cond in term.applicability_conditions %}
+        <div class="condition-card">
+            {% if cond.comment %}<p class="condition-comment">{{ cond.comment }}</p>{% endif %}
+            <table class="condition-table">
+                {% if cond.actors %}
+                <tr><th>Actor</th><td>{% for v in cond.actors %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+                {% if cond.risk_levels %}
+                <tr><th>Risk level</th><td>{% for v in cond.risk_levels %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+                {% if cond.lifecycle_stages %}
+                <tr><th>Lifecycle stage</th><td>{% for v in cond.lifecycle_stages %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+                {% if cond.system_types %}
+                <tr><th>System type</th><td>{% for v in cond.system_types %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+                {% if cond.sectors %}
+                <tr><th>Sector</th><td>{% for v in cond.sectors %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+                {% if cond.entity_types %}
+                <tr><th>Entity type</th><td>{% for v in cond.entity_types %}{{ v | term_link }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+                {% endif %}
+            </table>
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
     {% if term.sidecar %}
     <div class="sidecar-content">
         {{ term.sidecar | safe }}

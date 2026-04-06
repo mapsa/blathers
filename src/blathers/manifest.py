@@ -97,6 +97,18 @@ def build_manifest(
             "subject_of": subject_of_map.get(cls.iri, []),
             "object_of": object_of_map.get(cls.iri, []),
             "instances": class_instances_map.get(cls.iri, []),
+            "applicability_conditions": [
+                {
+                    "comment": c.comment,
+                    "actors": c.actors,
+                    "risk_levels": c.risk_levels,
+                    "lifecycle_stages": c.lifecycle_stages,
+                    "system_types": c.system_types,
+                    "sectors": c.sectors,
+                    "entity_types": c.entity_types,
+                }
+                for c in cls.applicability_conditions
+            ],
             "sidecar": sc.html if sc else None,
         })
 

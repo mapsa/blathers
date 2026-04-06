@@ -224,6 +224,13 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .narrative img, .sidecar-content img, .content img { max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 1rem auto; }
 .narrative img:not([width]), .sidecar-content img:not([width]), .content img:not([width]) { max-width: min(100%, 800px); }
 .narrative em:only-child, .sidecar-content em:only-child { display: block; text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin-top: -0.5rem; margin-bottom: 1rem; }
+.narrative table, .sidecar-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+.narrative th, .sidecar-content th { text-align: left; padding: 0.45rem 0.85rem; font-weight: 600;
+    background: var(--term-header-bg); border-bottom: 2px solid var(--border); white-space: nowrap; }
+.narrative td, .sidecar-content td { padding: 0.4rem 0.85rem; border-bottom: 1px solid var(--border);
+    vertical-align: top; }
+.narrative tr:last-child td, .sidecar-content tr:last-child td { border-bottom: none; }
+.narrative tbody tr:hover, .sidecar-content tbody tr:hover { background: var(--code-bg); }
 .narrative ul, .narrative ol, .sidecar-content ul, .sidecar-content ol,
 .detail-def ul, .detail-def ol { padding-left: 1.5rem; margin: 0.5rem 0; }
 .sidecar-content { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
@@ -331,6 +338,38 @@ code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 3px; 
 .shape-constraints { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
 .shape-constraints th, .shape-constraints td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--border); }
 .shape-constraints th { background: var(--term-header-bg); font-weight: 600; font-size: 0.9rem; }
+
+/* Admonitions (Python-Markdown admonition extension) */
+.admonition { padding: 0.75em 1em; border-left: 4px solid; border-radius: 4px; margin: 1em 0; }
+.admonition-title { font-weight: 700; margin-bottom: 0.4em; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.admonition.note   { background: #fffde7; border-color: #f9a825; }
+.admonition.tip    { background: #e8f5e9; border-color: #2e7d32; }
+.admonition.warning, .admonition.caution { background: #fff3e0; border-color: #e65100; }
+.admonition.danger { background: #fce4ec; border-color: #c62828; }
+.admonition.important { background: #e3f2fd; border-color: #1565c0; }
+[data-theme="dark"] .admonition.note      { background: #3d3000; border-color: #f9a825; }
+[data-theme="dark"] .admonition.tip       { background: #0d2e10; border-color: #4caf50; }
+[data-theme="dark"] .admonition.warning, [data-theme="dark"] .admonition.caution { background: #2e1500; border-color: #ff6d00; }
+[data-theme="dark"] .admonition.danger    { background: #2e0010; border-color: #ef5350; }
+[data-theme="dark"] .admonition.important { background: #001a2e; border-color: #42a5f5; }
+
+/* Term detail link (index → standalone page) */
+.term-detail-link { font-size: 0.72em; font-weight: 500; padding: 0.1rem 0.5rem;
+                    border: 1px solid var(--accent); border-radius: 4px; vertical-align: middle;
+                    text-decoration: none; color: var(--accent); white-space: nowrap; }
+.term-detail-link:hover { background: var(--accent); color: #fff; text-decoration: none; }
+
+/* Applicability conditions */
+.applicability-conditions { margin-top: 1.5rem; }
+.applicability-conditions > p { margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
+.condition-card { border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem 1rem; margin: 0.5rem 0; background: var(--code-bg); }
+.condition-comment { font-style: italic; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem; }
+.condition-table { width: 100%; border-collapse: collapse; }
+.condition-table th { text-align: left; padding: 0.3rem 0.75rem; width: 140px; vertical-align: top;
+                      font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);
+                      border-bottom: 1px solid var(--border); }
+.condition-table td { padding: 0.3rem 0.75rem; border-bottom: 1px solid var(--border); }
+.condition-table tr:last-child th, .condition-table tr:last-child td { border-bottom: none; }
 
 /* Serializations */
 .serialization-links { list-style: none; padding: 0; }

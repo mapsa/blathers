@@ -25,7 +25,7 @@ def _parse_sidecar(path: Path) -> Sidecar:
     """Parse a single Markdown sidecar with YAML frontmatter."""
     post = frontmatter.load(str(path))
     body = post.content
-    html = markdown.markdown(body, extensions=["tables", "fenced_code", "attr_list"])
+    html = markdown.markdown(body, extensions=["tables", "fenced_code", "attr_list", "admonition"])
     filename = path.name
     is_narrative = filename.startswith("_")
 

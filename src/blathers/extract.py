@@ -10,6 +10,7 @@ from rdflib.namespace import DCTERMS, OWL, RDF, RDFS
 
 SH = Namespace("http://www.w3.org/ns/shacl#")
 VANN = Namespace("http://purl.org/vocab/vann/")
+PRISM = Namespace("https://w3id.org/prism#")
 
 
 def _local_name(iri: str) -> str:
@@ -24,6 +25,18 @@ def _str_or_none(val) -> str | None:
 
 
 @dataclass
+class ExtractedCondition:
+    """A single prism:ApplicabilityCondition blank node attached to a class."""
+    comment: str | None = None
+    actors: list[str] = field(default_factory=list)
+    risk_levels: list[str] = field(default_factory=list)
+    lifecycle_stages: list[str] = field(default_factory=list)
+    system_types: list[str] = field(default_factory=list)
+    sectors: list[str] = field(default_factory=list)
+    entity_types: list[str] = field(default_factory=list)
+
+
+@dataclass
 class ExtractedClass:
     iri: str
     local_name: str
@@ -32,6 +45,7 @@ class ExtractedClass:
     superclasses: list[str] = field(default_factory=list)
     subclasses: list[str] = field(default_factory=list)
     properties: list[str] = field(default_factory=list)
+    applicability_conditions: list[ExtractedCondition] = field(default_factory=list)
 
 
 @dataclass
@@ -121,12 +135,24 @@ def _extract_classes(g: Graph, namespace: str) -> list[ExtractedClass]:
         label = _str_or_none(g.value(cls_iri, RDFS.label))
         comment = _str_or_none(g.value(cls_iri, RDFS.comment))
         supers = [str(s) for s in g.objects(cls_iri, RDFS.subClassOf) if isinstance(s, URIRef)]
+        conditions = []
+        for cond_node in g.objects(cls_iri, PRISM.hasApplicabilityCondition):
+            conditions.append(ExtractedCondition(
+                comment=_str_or_none(g.value(cond_node, RDFS.comment)),
+                actors=[str(v) for v in g.objects(cond_node, PRISM.forActor)],
+                risk_levels=[str(v) for v in g.objects(cond_node, PRISM.forRiskLevel)],
+                lifecycle_stages=[str(v) for v in g.objects(cond_node, PRISM.atLifecycleStage)],
+                system_types=[str(v) for v in g.objects(cond_node, PRISM.forSystemType)],
+                sectors=[str(v) for v in g.objects(cond_node, PRISM.forSector)],
+                entity_types=[str(v) for v in g.objects(cond_node, PRISM.forEntityType)],
+            ))
         classes.append(ExtractedClass(
             iri=iri_str,
             local_name=_local_name(iri_str),
             label=label,
             comment=comment,
             superclasses=supers,
+            applicability_conditions=conditions,
         ))
 
     # Populate subclasses by inverse lookup
