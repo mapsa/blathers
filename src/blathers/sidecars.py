@@ -19,6 +19,8 @@ class Sidecar:
     body: str
     html: str
     is_narrative: bool
+    standalone_page: bool = False
+    description: str = ""
 
 
 def _parse_sidecar(path: Path) -> Sidecar:
@@ -29,6 +31,9 @@ def _parse_sidecar(path: Path) -> Sidecar:
     filename = path.name
     is_narrative = filename.startswith("_")
 
+    standalone_page = bool(post.get("page", False))
+    description = str(post.get("description", ""))
+
     return Sidecar(
         filename=filename,
         path=path,
@@ -38,6 +43,8 @@ def _parse_sidecar(path: Path) -> Sidecar:
         body=body,
         html=html,
         is_narrative=is_narrative,
+        standalone_page=standalone_page,
+        description=description,
     )
 
 

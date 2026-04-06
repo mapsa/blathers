@@ -9,9 +9,11 @@
         <ul class="toc-list">
             {% if sections %}
             {% for section in sections %}
-            <li><a href="#section-{{ section.filename | replace('.md','') | replace('_','') }}">{{ section.section | capitalize }}</a></li>
+            <li>{% if section.standalone_page %}<a href="{{ section.section }}.html">{{ section.section | replace('-', ' ') | capitalize }} ↗</a>{% else %}<a href="#section-{{ section.filename | replace('.md','') | replace('_','') }}">{{ section.section | replace('-', ' ') | capitalize }}</a>{% endif %}</li>
             {% endfor %}
             {% endif %}
+            {% set queries_has_page = sections | selectattr('standalone_page') | selectattr('section', 'equalto', 'queries') | list | length > 0 %}
+            {% if example_queries and not queries_has_page %}<li><a href="#section-example-queries">Example Queries</a></li>{% endif %}
             {% if classes %}<li><a href="#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
             {% if classes %}<li>
                 <a href="#classes" class="toc-section-link">Classes <span class="toc-count">{{ classes | length + individuals | length }}</span></a>
@@ -156,10 +158,54 @@
 
     {# ── Narrative Sections ── #}
     {% for section in sections %}
+    {% if section.standalone_page %}
+    <div class="section-page-card" id="section-{{ section.filename | replace('.md','') | replace('_','') }}">
+        <h2>{{ section.section | replace('-', ' ') | capitalize }}</h2>
+        {% if section.description %}<p>{{ section.description }}</p>{% endif %}
+        <a href="{{ section.section }}.html" class="section-page-link">Read {{ section.section | replace('-', ' ') }} &rarr;</a>
+    </div>
+    {% else %}
     <section class="narrative" id="section-{{ section.filename | replace('.md','') | replace('_','') }}">
         {{ section.html | safe }}
     </section>
+    {% endif %}
     {% endfor %}
+
+    {# ── Example Queries (inline only when no standalone queries page exists) ── #}
+    {% set queries_has_page = sections | selectattr('standalone_page') | selectattr('section', 'equalto', 'queries') | list | length > 0 %}
+    {% if example_queries and not queries_has_page %}
+    {% set categories = [] %}
+    {% for q in example_queries %}{% if q.category not in categories %}{% set _ = categories.append(q.category) %}{% endif %}{% endfor %}
+    <section class="narrative" id="section-example-queries">
+        <h2>Example Queries</h2>
+        <p>The queries below run against the PRISM ontology and instance data.
+        Each query uses SPARQL with the declared PREFIX bindings.</p>
+        {% for cat in categories %}
+        <h3 class="query-category">{{ cat }}</h3>
+        {% for q in example_queries %}{% if q.category == cat %}
+        <div class="example-query">
+            <h4>{{ q.title }}</h4>
+            {% if q.description %}<p class="query-description">{{ q.description }}</p>{% endif %}
+            <pre class="sparql-code"><code>{{ q.sparql_text | e }}</code></pre>
+            {% if q.error %}
+            <p class="query-error">Query error: {{ q.error }}</p>
+            {% elif q.rows %}
+            <table class="query-results">
+                <thead><tr>{% for col in q.columns %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                {% for row in q.rows %}
+                <tr>{% for cell in row %}<td><code>{{ cell }}</code></td>{% endfor %}</tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="query-no-results">No results.</p>
+            {% endif %}
+        </div>
+        {% endif %}{% endfor %}
+        {% endfor %}
+    </section>
+    {% endif %}
 
     {# ── Concept Hierarchy ── #}
     {% if classes %}
@@ -337,6 +383,30 @@
 
 {% block scripts %}
 <script>
+/* SPARQL syntax highlighter */
+(function(){
+    var blocks = document.querySelectorAll('.sparql-code code');
+    for (var i = 0; i < blocks.length; i++) {
+        /* Use innerHTML (HTML-escaped) to avoid &lt;iri&gt; being parsed as tags */
+        var text = blocks[i].innerHTML;
+        text = text
+            /* IRIs first — must run before comment regex to protect # inside IRIs */
+            .replace(/(&lt;\S*?&gt;)/g, '<span class="iri">$1</span>')
+            /* keywords */
+            .replace(/\b(SELECT|WHERE|PREFIX|FILTER|OPTIONAL|UNION|GRAPH|FROM|NAMED|ASK|CONSTRUCT|DESCRIBE|LIMIT|OFFSET|ORDER\s+BY|GROUP\s+BY|HAVING|DISTINCT|REDUCED|AS|BIND|VALUES|SERVICE|MINUS|NOT\s+EXISTS|EXISTS|IN|NOT\s+IN)\b/gi,
+                function(m){ return '<span class="kw">' + m + '</span>'; })
+            /* bare 'a' keyword (type assertion) — only when surrounded by whitespace */
+            .replace(/(\s)(a)(\s)/g, '$1<span class="kw">$2</span>$3')
+            /* ?variables */
+            .replace(/(\?[A-Za-z_]\w*)/g, '<span class="var">$1</span>')
+            /* prefix:localName */
+            .replace(/\b([A-Za-z][\w-]*:[A-Za-z_][\w.-]*)/g, '<span class="pfx">$1</span>')
+            /* comments — # not followed by &gt; (which would be end of an IRI) */
+            .replace(/(#(?!&gt;)[^\n]*)/g, '<span class="cmt">$1</span>');
+        blocks[i].innerHTML = text;
+    }
+})();
+
 (function(){
     /* --- TOC section toggle --- */
     var sectionLinks = document.querySelectorAll('.toc-section-link');

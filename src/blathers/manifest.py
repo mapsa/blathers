@@ -43,6 +43,7 @@ def build_manifest(
     data: OntologyData,
     sidecars: list[Sidecar],
     validation_results: list[ValidationResult],
+    example_queries: list | None = None,
 ) -> dict:
     prefix = config.metadata.prefix
     namespace = config.metadata.namespace
@@ -144,6 +145,8 @@ def build_manifest(
                 "section": sc.section,
                 "order": sc.order,
                 "html": sc.html,
+                "standalone_page": sc.standalone_page,
+            "description": sc.description,
             })
 
     error_count = sum(1 for r in validation_results if r.severity == Severity.ERROR)
@@ -189,4 +192,17 @@ def build_manifest(
             "errors": error_count,
             "warnings": warning_count,
         },
+        "example_queries": [
+            {
+                "title": q.title,
+                "description": q.description,
+                "order": q.order,
+                "category": q.category,
+                "sparql_text": q.sparql_text,
+                "columns": q.columns,
+                "rows": q.rows,
+                "error": q.error,
+            }
+            for q in (example_queries or [])
+        ],
     }

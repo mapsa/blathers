@@ -1,0 +1,103 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ section.section | replace('-', ' ') | capitalize }} — {{ metadata.title }}{% endblock %}
+
+{% block body_content %}
+<div class="page-wrapper">
+    {# ── Sidebar TOC ── #}
+    <nav class="sidebar" id="toc">
+        <a href="index.html#top" class="toc-title">Table of Contents</a>
+        <ul class="toc-list">
+            {% for sec in sections %}
+            <li>
+                {% if sec.standalone_page %}
+                    {% if sec.section == section.section %}
+                    <a href="{{ sec.section }}.html" class="active">{{ sec.section | replace('-', ' ') | capitalize }} ↗</a>
+                    {% else %}
+                    <a href="{{ sec.section }}.html">{{ sec.section | replace('-', ' ') | capitalize }} ↗</a>
+                    {% endif %}
+                {% else %}
+                <a href="index.html#section-{{ sec.filename | replace('.md','') | replace('_','') }}">{{ sec.section | replace('-', ' ') | capitalize }}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+            {% if classes %}<li><a href="index.html#concept-hierarchy">Concept Hierarchy</a></li>{% endif %}
+            {% if classes %}<li>
+                <a href="index.html#classes" class="toc-section-link">Classes <span class="toc-count">{{ classes | length + individuals | length }}</span></a>
+            </li>{% endif %}
+            {% if properties %}<li>
+                <a href="index.html#properties" class="toc-section-link">Properties <span class="toc-count">{{ properties | length }}</span></a>
+            </li>{% endif %}
+            {% if shapes %}<li>
+                <a href="index.html#shapes" class="toc-section-link">SHACL Shapes <span class="toc-count">{{ shapes | length }}</span></a>
+            </li>{% endif %}
+        </ul>
+    </nav>
+
+    {# ── Main Content ── #}
+    <div class="content" id="top">
+        <p class="breadcrumb"><a href="index.html">&larr; {{ metadata.title }}</a></p>
+
+        {% if section.html %}
+        <article class="narrative">
+            {{ section.html | safe }}
+        </article>
+        {% endif %}
+
+        {% if section.section == 'queries' and example_queries %}
+        {% set categories = [] %}
+        {% for q in example_queries %}{% if q.category not in categories %}{% set _ = categories.append(q.category) %}{% endif %}{% endfor %}
+        <section class="narrative">
+            <h2>Example Queries</h2>
+            <p>The queries below run against the PRISM ontology and instance data.
+            Each query uses SPARQL with the declared PREFIX bindings.</p>
+            {% for cat in categories %}
+            <h3 class="query-category">{{ cat }}</h3>
+            {% for q in example_queries %}{% if q.category == cat %}
+            <div class="example-query">
+                <h4>{{ q.title }}</h4>
+                {% if q.description %}<p class="query-description">{{ q.description }}</p>{% endif %}
+                <pre class="sparql-code"><code>{{ q.sparql_text | e }}</code></pre>
+                {% if q.error %}
+                <p class="query-error">Query error: {{ q.error }}</p>
+                {% elif q.rows %}
+                <table class="query-results">
+                    <thead><tr>{% for col in q.columns %}<th>{{ col }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                    {% for row in q.rows %}
+                    <tr>{% for cell in row %}<td><code>{{ cell }}</code></td>{% endfor %}</tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="query-no-results">No results.</p>
+                {% endif %}
+            </div>
+            {% endif %}{% endfor %}
+            {% endfor %}
+        </section>
+        {% endif %}
+    </div>{# /.content #}
+</div>{# /.page-wrapper #}
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* SPARQL syntax highlighter */
+(function(){
+    var blocks = document.querySelectorAll('.sparql-code code');
+    for (var i = 0; i < blocks.length; i++) {
+        var text = blocks[i].innerHTML;
+        text = text
+            .replace(/(&lt;\S*?&gt;)/g, '<span class="iri">$1</span>')
+            .replace(/\b(SELECT|WHERE|PREFIX|FILTER|OPTIONAL|UNION|GRAPH|FROM|NAMED|ASK|CONSTRUCT|DESCRIBE|LIMIT|OFFSET|ORDER\s+BY|GROUP\s+BY|HAVING|DISTINCT|REDUCED|AS|BIND|VALUES|SERVICE|MINUS|NOT\s+EXISTS|EXISTS|IN|NOT\s+IN)\b/gi,
+                function(m){ return '<span class="kw">' + m + '</span>'; })
+            .replace(/(\s)(a)(\s)/g, '$1<span class="kw">$2</span>$3')
+            .replace(/(\?[A-Za-z_]\w*)/g, '<span class="var">$1</span>')
+            .replace(/\b([A-Za-z][\w-]*:[A-Za-z_][\w.-]*)/g, '<span class="pfx">$1</span>')
+            .replace(/(#(?!&gt;)[^\n]*)/g, '<span class="cmt">$1</span>');
+        blocks[i].innerHTML = text;
+    }
+})();
+</script>
+{% endblock %}

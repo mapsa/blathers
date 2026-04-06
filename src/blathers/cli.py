@@ -207,8 +207,29 @@ def build(config_path: str, output_dir: str | None) -> None:
     data = extract_ontology(config.resolve_path(config.ontology), shacl_paths=shacl_paths)
     sidecars = load_sidecars(config.resolve_path(config.sidecars))
 
+    # Load example instances into ontology graph for SPARQL queries
+    example_ttl_paths = []
+    for pattern in config.examples:
+        example_ttl_paths.extend(
+            Path(p) for p in globmod.glob(str(config.resolve_path(Path(pattern))))
+        )
+    for p in example_ttl_paths:
+        try:
+            data.graph.parse(str(p))
+        except Exception as exc:
+            click.echo(f"  Warning: could not load example {p}: {exc}", err=True)
+
+    # Load and run example queries
+    example_queries = []
+    if config.sparql_dir:
+        from blathers.queries import load_and_run_queries
+        sparql_path = config.resolve_path(config.sparql_dir)
+        if sparql_path.is_dir():
+            example_queries = load_and_run_queries(sparql_path, data.graph)
+            click.echo(f"  Ran {len(example_queries)} example queries")
+
     # Build manifest
-    manifest = build_manifest(config, data, sidecars, [])
+    manifest = build_manifest(config, data, sidecars, [], example_queries)
 
     # Render HTML
     render_site(manifest, out)

@@ -406,6 +406,45 @@ html { scroll-behavior: smooth; }
 @keyframes term-flash { from { background: rgba(99,91,255,0.12); } to { background: transparent; } }
 .term-def.highlight { animation: term-flash 1.5s ease-out; }
 
+/* Example queries */
+.example-query { margin: 2rem 0; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; background: var(--bg); }
+.example-query h4 { margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: var(--fg); }
+.query-category { margin: 1.5rem 0 0.5rem 0; font-size: 1.05rem; font-weight: 600; color: var(--fg); border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+.query-description { margin: 0 0 0.75rem 0; color: var(--text-secondary); font-size: 0.9rem; }
+.sparql-code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+               padding: 1rem 1.25rem; overflow-x: auto; font-size: 0.83rem; line-height: 1.6; margin: 0 0 0.75rem 0; }
+.sparql-code code { padding: 0; background: transparent; border-radius: 0; font-size: inherit; }
+.sparql-code .kw  { color: #6366f1; font-weight: 600; }
+.sparql-code .pfx { color: #0891b2; }
+.sparql-code .iri { color: #059669; }
+.sparql-code .var { color: #b45309; }
+.sparql-code .cmt { color: var(--text-secondary); font-style: italic; }
+[data-theme="dark"] .sparql-code .kw  { color: #a5b4fc; }
+[data-theme="dark"] .sparql-code .pfx { color: #67e8f9; }
+[data-theme="dark"] .sparql-code .iri { color: #6ee7b7; }
+[data-theme="dark"] .sparql-code .var { color: #fcd34d; }
+.query-results { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.5rem; }
+.query-results th { text-align: left; padding: 0.4rem 0.75rem; background: var(--term-header-bg);
+                    border-bottom: 2px solid var(--border); font-weight: 600; }
+.query-results td { padding: 0.35rem 0.75rem; border-bottom: 1px solid var(--border); }
+.query-results tbody tr:hover { background: var(--code-bg); }
+.query-error { color: #dc2626; font-size: 0.9rem; padding: 0.5rem 0.75rem; background: #fef2f2;
+               border: 1px solid #fca5a5; border-radius: 4px; }
+[data-theme="dark"] .query-error { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
+.query-no-results { color: var(--text-secondary); font-style: italic; font-size: 0.9rem; }
+
+/* Breadcrumb back link on standalone pages */
+.breadcrumb { font-size: 0.85rem; margin-bottom: 1.5rem; }
+.breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent); }
+
+/* Standalone-page section card */
+.section-page-card { border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
+.section-page-card h2 { margin: 0 0 0.35rem 0; font-size: 1.1rem; }
+.section-page-card p { margin: 0 0 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem; }
+.section-page-link { font-size: 0.85rem; text-decoration: none; color: var(--accent); font-weight: 500; }
+.section-page-link:hover { text-decoration: underline; }
+
 @media (max-width: 900px) {
     .page-wrapper { flex-direction: column; }
     .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
@@ -463,11 +502,29 @@ def render_site(manifest: dict, output_dir: Path) -> None:
         "conneg": manifest.get("conneg", {}),
         "hierarchy": hierarchy,
         "inline_css": DEFAULT_CSS,
+        "example_queries": manifest.get("example_queries", []),
     }
 
     # Render index
     index_tpl = env.get_template("index.html.j2")
     (output_dir / "index.html").write_text(index_tpl.render(base_path="", **ctx))
+
+    # Render standalone narrative pages
+    try:
+        narrative_tpl = env.get_template("narrative.html.j2")
+    except Exception:
+        narrative_tpl = None
+
+    if narrative_tpl:
+        for section in manifest["sections"]:
+            if section.get("standalone_page"):
+                page_name = section["section"] or section["filename"].replace(".md", "").lstrip("_")
+                html = narrative_tpl.render(
+                    base_path="",
+                    section=section,
+                    **ctx,
+                )
+                (output_dir / f"{page_name}.html").write_text(html)
 
     # Render class pages
     classes_dir = output_dir / "classes"

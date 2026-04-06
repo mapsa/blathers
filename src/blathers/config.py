@@ -67,6 +67,7 @@ class BlathersConfig(BaseModel):
     examples: list[str] = Field(default_factory=list)
     sidecars: Path = Path("sidecars/")
     figures: Path = Path("figures/")
+    sparql_dir: Optional[Path] = None
     output: Path = Path("dist/")
     metadata: MetadataConfig
     imports: list[ImportConfig] = Field(default_factory=list)
