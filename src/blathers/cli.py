@@ -219,6 +219,13 @@ def build(config_path: str, output_dir: str | None) -> None:
         except Exception as exc:
             click.echo(f"  Warning: could not load example {p}: {exc}", err=True)
 
+    # Classify high-risk systems using SHACL shapes
+    if config.classification_shapes:
+        from blathers.classifier import classify_high_risk
+        shapes_paths = [config.resolve_path(p) for p in config.classification_shapes]
+        n = classify_high_risk(data.graph, shapes_paths)
+        click.echo(f"  Classified {n} high-risk system(s)")
+
     # Load and run example queries
     example_queries = []
     if config.sparql_dir:

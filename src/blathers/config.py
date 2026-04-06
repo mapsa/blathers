@@ -68,6 +68,7 @@ class BlathersConfig(BaseModel):
     sidecars: Path = Path("sidecars/")
     figures: Path = Path("figures/")
     sparql_dir: Optional[Path] = None
+    classification_shapes: list[Path] = Field(default_factory=list)
     output: Path = Path("dist/")
     metadata: MetadataConfig
     imports: list[ImportConfig] = Field(default_factory=list)
